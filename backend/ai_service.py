@@ -1,6 +1,6 @@
 import os
 import asyncio
-from google import genai
+import google.generativeai as genai
 
 _client = None
 
