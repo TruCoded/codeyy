@@ -1,20 +1,28 @@
 import os
 import asyncio
+from dotenv import load_dotenv
 import google.generativeai as genai
 
+# Load environment variables from .env
+load_dotenv()
+
 MODEL_NAME = "gemini-2.0-flash-lite"
+
+# Get API key from environment
+API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # Configure API
 def configure_genai(api_key: str):
     genai.configure(api_key=api_key)
 
+
 # ---------------- IMAGE → CODE ----------------
-async def extract_code_from_image(image_bytes: bytes, media_type: str = "image/png", api_key: str = "") -> str:
+async def extract_code_from_image(image_bytes: bytes, media_type: str = "image/png") -> str:
     import PIL.Image
     import io
 
     def _call():
-        configure_genai(api_key)
+        configure_genai(API_KEY)
         model = genai.GenerativeModel(MODEL_NAME)
 
         img = PIL.Image.open(io.BytesIO(image_bytes))
@@ -28,10 +36,11 @@ async def extract_code_from_image(image_bytes: bytes, media_type: str = "image/p
 
     return await asyncio.to_thread(_call)
 
+
 # ---------------- DETECT LANGUAGE ----------------
-async def detect_language(code: str, api_key: str = "") -> str:
+async def detect_language(code: str) -> str:
     def _call():
-        configure_genai(api_key)
+        configure_genai(API_KEY)
         model = genai.GenerativeModel(MODEL_NAME)
 
         response = model.generate_content(
@@ -41,6 +50,7 @@ async def detect_language(code: str, api_key: str = "") -> str:
         return response.text.strip()
 
     return await asyncio.to_thread(_call)
+
 
 # ---------------- HELPERS ----------------
 def _numbered(code: str) -> str:
@@ -53,6 +63,7 @@ def _extract(text: str, start: str, end: str) -> str:
         return text[s:e].strip()
     except ValueError:
         return ""
+
 
 # ---------------- PROMPTS ----------------
 def prompt1(code: str, lang: str) -> str:
@@ -99,21 +110,22 @@ Give improvements.
 SUGGESTIONS_END
 """
 
-# ---------------- ANALYZE ----------------
-def _sync_call(prompt: str, api_key: str) -> str:
-    configure_genai(api_key)
-    model = genai.GenerativeModel(MODEL_NAME)
 
+# ---------------- ANALYZE ----------------
+def _sync_call(prompt: str) -> str:
+    configure_genai(API_KEY)
+    model = genai.GenerativeModel(MODEL_NAME)
     response = model.generate_content(prompt)
     return response.text
 
-async def analyze_code(code: str, language: str, api_key: str = "") -> dict:
+
+async def analyze_code(code: str, language: str) -> dict:
     p1 = prompt1(code, language)
     p2 = prompt2(code, language)
 
     r1, r2 = await asyncio.gather(
-        asyncio.to_thread(_sync_call, p1, api_key),
-        asyncio.to_thread(_sync_call, p2, api_key),
+        asyncio.to_thread(_sync_call, p1),
+        asyncio.to_thread(_sync_call, p2),
     )
 
     return {
@@ -126,9 +138,10 @@ async def analyze_code(code: str, language: str, api_key: str = "") -> dict:
         "suggestions": _extract(r2, "SUGGESTIONS_START", "SUGGESTIONS_END"),
     }
 
+
 # ---------------- FOLLOW-UP ----------------
-async def ask_followup(question: str, code: str, language: str, history: list, api_key: str = "") -> str:
-    configure_genai(api_key)
+async def ask_followup(question: str, code: str, language: str) -> str:
+    configure_genai(API_KEY)
     model = genai.GenerativeModel(MODEL_NAME)
 
     context = f"""
