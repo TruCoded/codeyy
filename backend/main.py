@@ -13,7 +13,7 @@ from typing import Optional
 import base64
 import traceback
 
-from ai_service import analyze_code, ask_followup, extract_code_from_image
+from ai_service import analyze_code, ask_followup, extract_code_from_image, detect_language
 
 app = FastAPI(title="CodeVision (Gemini)", version="4.1.0")
 
@@ -89,9 +89,15 @@ async def analyze(req: AnalyzeRequest):
     if not code:
         raise HTTPException(400, "No code provided.")
 
+    # Auto-detect language if not specified
+    lang = req.language
+    if not lang or lang.lower() in ("auto", ""):
+        lang = await detect_language(code)
+
     try:
-        result = await analyze_code(code, req.language)
+        result = await analyze_code(code, lang)
         result["extracted_code"] = code if req.image_base64 else None
+        result["detected_language"] = lang
         return JSONResponse(result)
     except Exception as e:
         traceback.print_exc()
