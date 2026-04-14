@@ -6,7 +6,7 @@ import google.generativeai as genai
 # Load environment variables from .env
 load_dotenv()
 
-MODEL_NAME = "gemini-2.0-flash-lite"
+MODEL_NAME = "gemini-1.5-flash"
 
 # Get API key from environment
 API_KEY = os.getenv("GEMINI_API_KEY", "")
