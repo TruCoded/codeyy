@@ -668,7 +668,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           <input type="text" id="apiUrlInput" placeholder="http://127.0.0.1:8000" spellcheck="false" autocomplete="off" style="font-family: var(--fb);" />
         </div>
         <p style="font-size: 0.64rem; color: var(--tx3); margin-top: 4px; line-height: 1.4;">
-          Default: local backend. If Vercel blocks connection to 127.0.0.1, enter a secure tunnel URL (e.g. ngrok). Keep blank to use default.
+          Default: https://codeyy.onrender.com (on Vercel) or local backend (on localhost). Keep blank to use default.
         </p>
       </div>
     </div>
@@ -681,7 +681,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <div class="toast hidden" id="toast"></div>
 
 <script>
-let API = localStorage.getItem('codeyy_api_url') || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'http://127.0.0.1:8000');
+const DEPLOYED_BACKEND_URL = 'https://codeyy.onrender.com';
+let API = localStorage.getItem('codeyy_api_url') || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : DEPLOYED_BACKEND_URL);
 let curCode='',curLang='python';
 let imgB64=null,imgMime='image/png';
 let mode='code';
@@ -1019,6 +1020,9 @@ function openKeyModal() {
   const urlInput = g('apiUrlInput');
   if (urlInput) {
     urlInput.value = localStorage.getItem('codeyy_api_url') || '';
+    urlInput.placeholder = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:8000 (Default)'
+      : 'https://codeyy.onrender.com (Default)';
   }
   
   modal.classList.remove('hidden');
@@ -1043,7 +1047,7 @@ async function saveKey() {
     API = urlVal;
   } else {
     localStorage.removeItem('codeyy_api_url');
-    API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'http://127.0.0.1:8000';
+    API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : DEPLOYED_BACKEND_URL;
   }
 
   if (val) {
@@ -1058,14 +1062,14 @@ async function saveKey() {
       if (res.ok) {
         showToast('✓ Settings saved successfully');
       } else {
-        showToast('⚠ Saved locally, but failed to save to server');
+        showToast('✓ Settings saved locally');
       }
     } catch (err) {
-      showToast('⚠ Saved locally, but server was unreachable');
+      showToast('✓ Settings saved locally');
     }
   } else {
     localStorage.removeItem('gemini_api_key');
-    showToast('Gemini API Key removed. Clearing server key.');
+    showToast('Gemini API Key removed.');
     try {
       await fetch(`${API}/api/key`, {
         method: 'POST',
