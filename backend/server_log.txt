@@ -1,0 +1,127 @@
+INFO:     Started server process [24204]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50121 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50121 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50121 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+Traceback (most recent call last):
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\main.py", line 93, in analyze
+    result = await analyze_code(code, req.language)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\ai_service.py", line 122, in analyze_code
+    raise e
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\ai_service.py", line 107, in analyze_code
+    response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\concurrent\futures\thread.py", line 86, in run
+    result = ctx.run(self.task)
+  File "C:\Python314\Lib\concurrent\futures\thread.py", line 73, in run
+    return fn(*args, **kwargs)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\models.py", line 6480, in generate_content
+    response = self._generate_content(
+        model=model, contents=contents, config=parsed_config
+    )
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\models.py", line 4916, in _generate_content
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1611, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1404, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\concurrent\futures\_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\concurrent\futures\_base.py", line 395, in __get_result
+    raise self._exception
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1381, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\errors.py", line 184, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key expired. Please renew the API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key expired. Please renew the API key.'}]}}
+INFO:     127.0.0.1:50614 - "POST /analyze HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:63183 - "POST /ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58621 - "POST /ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53249 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50104 - "POST /ask HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50104 - "POST /ask HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\main.py", line 93, in analyze
+    result = await analyze_code(code, req.language)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\ai_service.py", line 122, in analyze_code
+    raise e
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\ai_service.py", line 107, in analyze_code
+    response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\concurrent\futures\thread.py", line 86, in run
+    result = ctx.run(self.task)
+  File "C:\Python314\Lib\concurrent\futures\thread.py", line 73, in run
+    return fn(*args, **kwargs)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\models.py", line 6480, in generate_content
+    response = self._generate_content(
+        model=model, contents=contents, config=parsed_config
+    )
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\models.py", line 4916, in _generate_content
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1611, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1404, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\concurrent\futures\_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Python314\Lib\concurrent\futures\_base.py", line 395, in __get_result
+    raise self._exception
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\tenacity\__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\_api_client.py", line 1381, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\Downloads\Final Codeyy\Final Codeyy\Codeyy-main\backend\venv\Lib\site-packages\google\genai\errors.py", line 184, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key expired. Please renew the API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key expired. Please renew the API key.'}]}}
+INFO:     127.0.0.1:50104 - "POST /analyze HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:61004 - "GET /login.html HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61004 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61487 - "GET /Summer%20Traning%20Project%202/login.html HTTP/1.1" 404 Not Found

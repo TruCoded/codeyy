@@ -5,28 +5,28 @@ import re
 from google import genai
 from google.genai import types
 
-_client = None
+_clients = {}
 
-def get_client():
-    global _client
-    key = os.getenv("GEMINI_API_KEY", "")
+def get_client(api_key: str = None):
+    key = api_key or os.getenv("GEMINI_API_KEY", "")
     if not key:
         raise RuntimeError(
             "GEMINI_API_KEY is not set. "
-            "Add it to backend/.env  →  GEMINI_API_KEY=AQ..."
+            "Please configure it in the application or backend/.env"
         )
-    if _client is None:
-        _client = genai.Client(api_key=key)
-    return _client
+    print(f"DEBUG: Using API key starting with {key[:10]}...")
+    if key not in _clients:
+        _clients[key] = genai.Client(api_key=key)
+    return _clients[key]
 
-MODEL_NAME = "gemini-2.5-flash-lite"
+MODEL_NAME = "gemini-2.5-flash"
 
 
 # ── Vision OCR ─────────────────────────────────────────────────────────────
 
-async def extract_code_from_image(image_bytes: bytes, media_type: str = "image/png") -> str:
+async def extract_code_from_image(image_bytes: bytes, media_type: str = "image/png", api_key: str = None) -> str:
     async def _call():
-        client = get_client()
+        client = get_client(api_key)
         prompt = "Extract ALL code from this screenshot exactly as written. Output ONLY raw code."
         try:
             response = client.models.generate_content(
@@ -34,19 +34,23 @@ async def extract_code_from_image(image_bytes: bytes, media_type: str = "image/p
                 contents=[prompt, types.Part.from_bytes(data=image_bytes, mime_type=media_type)]
             )
             return response.text.strip()
-        except: return ""
+        except Exception as e:
+            print(f"Error in extract_code_from_image: {e}")
+            raise e
     return await _call()
 
 # ── Language auto-detect ────────────────────────────────────────────────────
 
-async def detect_language(code: str) -> str:
+async def detect_language(code: str, api_key: str = None) -> str:
     async def _call():
-        client = get_client()
+        client = get_client(api_key)
         prompt = "What programming language is this? Reply with ONLY the language name.\n\n" + code[:1000]
         try:
             response = client.models.generate_content(model=MODEL_NAME, contents=prompt)
             return response.text.strip()
-        except: return "python"
+        except Exception as e:
+            print(f"Error in detect_language: {e}")
+            raise e
     return await _call()
 
 
@@ -97,8 +101,8 @@ def _extract(text: str, start: str, end: str) -> str:
     except: return ""
 
 
-async def analyze_code(code: str, language: str) -> dict:
-    client = get_client()
+async def analyze_code(code: str, language: str, api_key: str = None) -> dict:
+    client = get_client(api_key)
     prompt = get_mega_prompt(code, language)
     
     # Single attempt with short retry
@@ -122,8 +126,8 @@ async def analyze_code(code: str, language: str) -> dict:
                 raise e
 
 
-async def ask_followup(question: str, code: str, language: str, history: list) -> str:
-    client = get_client()
+async def ask_followup(question: str, code: str, language: str, history: list, api_key: str = None) -> str:
+    client = get_client(api_key)
     ctx = f"Senior {language} engineer. Code:\n{code}"
     chats = []
     for t in history[-4:]:
@@ -137,4 +141,6 @@ async def ask_followup(question: str, code: str, language: str, history: list) -
             config=types.GenerateContentConfig(system_instruction=ctx)
         )
         return res.text.strip()
-    except: return "Service busy. Please try again."
+    except Exception as e:
+        print(f"Error in ask_followup: {e}")
+        raise e
