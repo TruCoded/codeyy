@@ -1,8 +1,8 @@
 @echo off
-title CodeVision (Gemini) - Starting...
+title Codeyy (Gemini) - Starting...
 echo.
 echo  ==========================================
-echo   CodeVision - AI Code Analysis (Gemini)
+echo   Codeyy - AI Code Analysis (Gemini)
 echo  ==========================================
 echo.
 
@@ -34,31 +34,24 @@ pip install -r requirements.txt -q
 REM Check API key
 if not exist ".env" (
     echo.
-    echo  SETUP REQUIRED:
-    echo  1. Get your FREE Gemini API key from https://aistudio.google.com/apikey
-    echo  2. Open the file:  backend\.env
-    echo  3. Replace  YOUR_KEY_HERE  with your actual key
-    echo  4. Save and run this script again
+    echo  WARNING: backend\.env file does not exist.
+    echo  Creating a template file. You can enter your API key in the browser interface.
     echo.
     echo GEMINI_API_KEY=YOUR_KEY_HERE> .env
-    notepad .env
-    pause
-    exit /b
 )
 
 REM Check if key is still placeholder
 findstr /C:"YOUR_KEY_HERE" .env >nul 2>&1
 if not errorlevel 1 (
     echo.
-    echo  API key not set. Edit backend\.env and replace YOUR_KEY_HERE
-    notepad .env
-    pause
-    exit /b
+    echo  WARNING: API key in backend\.env is still a placeholder.
+    echo  Please enter your API key directly in the browser interface once it opens.
+    echo.
 )
 
 REM Start server and open browser
 echo.
-echo  Starting CodeVision at http://localhost:8000
+echo  Starting Codeyy at http://localhost:8000
 echo  Press Ctrl+C to stop
 echo.
 start "" http://localhost:8000

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>CodeVision — AI Code Analysis</title>
+<title>Codeyy — AI Code Analysis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Archivo:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;1,500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -34,7 +34,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .logo{display:flex;align-items:center;gap:9px}
 .logo-ic{width:30px;height:30px;border-radius:var(--r1);background:var(--gold2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;color:var(--gold)}
 .lc{font-family:var(--fd);font-size:1.18rem;font-weight:600}
-.lv{font-family:var(--fd);font-size:1.18rem;font-weight:500;font-style:italic;color:var(--gold)}
+.lv{font-family:var(--fd);font-size:1.18rem;font-weight:600;color:var(--gold)}
 .sep{width:1px;height:16px;background:var(--b2);margin:0 2px;flex-shrink:0}
 .hdr-sub{font-family:var(--fui);font-size:.63rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3)}
 .hdr-r{margin-left:auto;display:flex;align-items:center;gap:8px}
@@ -203,6 +203,202 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 @media(max-width:920px){.layout{grid-template-columns:1fr;padding:10px}.pr{max-height:none}.cxgrid{grid-template-columns:1fr 1fr}.hdr-sub,.sep{display:none}}
 @media(max-width:560px){.cxgrid{grid-template-columns:1fr}.panel{padding:13px}.otab{font-size:.57rem;padding:6px 5px}}
+
+/* Key Configuration Button & Modal Styling */
+.key-cfg-btn {
+  background: var(--bg3);
+  border: 1px solid var(--b2);
+  color: var(--tx2);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.key-cfg-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold3);
+}
+.key-cfg-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.kmodal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 14, 28, 0.85);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.25s ease;
+}
+.kmodal.hidden {
+  display: none !important;
+}
+.kmodal-content {
+  background: var(--bg2);
+  border: 1px solid var(--b2);
+  border-radius: var(--r4);
+  width: 90%;
+  max-width: 460px;
+  padding: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.kmodal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kmodal-header h3 {
+  font-family: var(--fui);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--tx1);
+  letter-spacing: 0.02em;
+}
+.kmodal-close {
+  background: none;
+  border: none;
+  color: var(--tx3);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.kmodal-close:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--tx2);
+}
+.kmodal-desc {
+  font-size: 0.76rem;
+  color: var(--tx2);
+  line-height: 1.6;
+}
+.kmodal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kmodal-field label {
+  font-family: var(--fui);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tx3);
+}
+.key-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bgi);
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  transition: border-color 0.2s;
+}
+.key-input-container:focus-within {
+  border-color: var(--gold);
+}
+.key-input-container input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--tx1);
+  font-family: var(--fm);
+  font-size: 0.8rem;
+  padding: 11px 13px;
+  outline: none;
+}
+.key-input-container input::placeholder {
+  color: var(--tx3);
+  opacity: 0.5;
+}
+.toggle-key-btn {
+  background: none;
+  border: none;
+  color: var(--tx3);
+  cursor: pointer;
+  padding: 0 13px;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.toggle-key-btn:hover {
+  color: var(--tx2);
+}
+.kmodal-info a {
+  font-family: var(--fui);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--gold);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.kmodal-info a:hover {
+  color: #e5c463;
+  text-decoration: underline;
+}
+.kmodal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+.kmodal-btn {
+  font-family: var(--fui);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  border-radius: var(--r2);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-secondary {
+  background: var(--bg3);
+  color: var(--tx2);
+  border: 1px solid var(--b2);
+}
+.btn-secondary:hover {
+  background: var(--bg4);
+  color: var(--tx1);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #c9a84c, #e5c463);
+  color: #0a1931;
+  font-weight: 700;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.25);
+}
+.btn-primary:active {
+  transform: none;
+}
 </style>
 </head>
 <body>
@@ -216,12 +412,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           <path d="M12 4L10 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <span class="lc">Code</span><span class="lv">Vision</span>
+      <span class="lc">Code<span class="lv">yy</span></span>
     </div>
     <span class="sep"></span>
     <span class="hdr-sub">Powered by Gemini</span>
     <div class="hdr-r">
       <div class="spill" id="spill"><span class="sdot"></span><span id="spillTxt">Checking…</span></div>
+      <button class="key-cfg-btn" id="keyCfgBtn" onclick="openKeyModal()" title="Configure Gemini API Key">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+        </svg>
+      </button>
     </div>
   </div>
 </header>
@@ -437,6 +638,36 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </section>
 </main>
 
+<!-- API Key Modal -->
+<div id="keyModal" class="kmodal hidden">
+  <div class="kmodal-content">
+    <div class="kmodal-header">
+      <h3>🔑 Configure Gemini API Key</h3>
+      <button class="kmodal-close" onclick="closeKeyModal()">✕</button>
+    </div>
+    <div class="kmodal-body">
+      <p class="kmodal-desc">
+        To use Codeyy, you need a Google Gemini API Key. The key is saved locally in your browser and sent securely to your local backend.
+      </p>
+      <div class="kmodal-field">
+        <label for="keyInput">Gemini API Key</label>
+        <div class="key-input-container">
+          <input type="password" id="keyInput" placeholder="AIzaSy..." spellcheck="false" autocomplete="off" />
+          <button class="toggle-key-btn" onclick="toggleKeyVisibility()">👁</button>
+        </div>
+      </div>
+      <div class="kmodal-info">
+        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
+          Get a FREE Gemini API Key from Google AI Studio ↗
+        </a>
+      </div>
+    </div>
+    <div class="kmodal-footer">
+      <button class="kmodal-btn btn-primary" onclick="saveKey()">Save Key</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast hidden" id="toast"></div>
 
 <script>
@@ -446,20 +677,72 @@ let imgB64=null,imgMime='image/png';
 let mode='code';
 let chatH=[],drSteps=[],drIdx=0,drTimer=null;
 
-document.addEventListener('DOMContentLoaded',()=>{
-  checkHealth(); updateLn();
+document.addEventListener('DOMContentLoaded', async () => {
+  const storedKey = localStorage.getItem('gemini_api_key');
+  if (storedKey && (storedKey === 'YOUR_KEY_HERE' || !(storedKey.startsWith('AIzaSy') || storedKey.startsWith('AQ.')))) {
+    localStorage.removeItem('gemini_api_key');
+  }
+
+  updateLn();
   document.getElementById('langSel').addEventListener('change',e=>{
     curLang=e.target.value;
     document.getElementById('edLang').textContent=e.target.value;
   });
+
+  // Fetch API key from backend
+  let key = '';
+  try {
+    const res = await fetch(`${API}/api/key`);
+    if (res.ok) {
+      const data = await res.json();
+      key = data.api_key || '';
+    }
+  } catch (err) {
+    console.error('Failed to fetch API key from backend:', err);
+  }
+
+  // Sync key with localStorage
+  if (key) {
+    localStorage.setItem('gemini_api_key', key);
+  } else {
+    key = localStorage.getItem('gemini_api_key') || '';
+    if (key) {
+      try {
+        await fetch(`${API}/api/key`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ api_key: key })
+        });
+      } catch (err) {
+        console.error('Failed to sync API key to backend:', err);
+      }
+    }
+  }
+
+  await checkHealth();
+
+  if (!key) {
+    setTimeout(openKeyModal, 800);
+  }
 });
 
 async function checkHealth(){
   try{
-    const r=await fetch(`${API}/health`);
+    const headers = {};
+    const userKey = localStorage.getItem('gemini_api_key');
+    if(userKey) headers['X-Gemini-API-Key'] = userKey;
+
+    const r=await fetch(`${API}/health`, { headers });
     const d=await r.json();
-    if(d.ok) setPill('Gemini Ready','');
-    else setPill('API key missing — see backend/.env','err');
+    if(d.ok) {
+      if(userKey) {
+        setPill('Gemini Ready (Local Key)','');
+      } else {
+        setPill('Gemini Ready (Server Key)','');
+      }
+    } else {
+      setPill('API key missing — click settings icon to configure','err');
+    }
   }catch{setPill('Backend not running — start it first','err');}
 }
 
@@ -516,11 +799,30 @@ async function detectLang(){
 }
 
 async function post(path,body){
-  const res=await fetch(`${API}${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const headers = {'Content-Type':'application/json'};
+  const userKey = localStorage.getItem('gemini_api_key');
+  if(userKey) headers['X-Gemini-API-Key'] = userKey;
+
+  const res=await fetch(`${API}${path}`,{
+    method:'POST',
+    headers:headers,
+    body:JSON.stringify(body)
+  });
   const text=await res.text();
   let data;
   try{data=JSON.parse(text);}catch{throw new Error('Server returned non-JSON. Is the backend running?');}
-  if(!res.ok)throw new Error(data.detail||`Error ${res.status}`);
+  if(!res.ok) {
+    const errorMsg = data.detail || `Error ${res.status}`;
+    // If the API key is invalid or expired, trigger key modal automatically
+    if (errorMsg.includes("API key expired") || errorMsg.includes("API_KEY_INVALID") || errorMsg.includes("INVALID_ARGUMENT") || errorMsg.includes("GEMINI_API_KEY is not set")) {
+      showToast('API Key is invalid or expired. Please update it.');
+      setTimeout(openKeyModal, 1200);
+    } else if (errorMsg.includes("not found for API version") || errorMsg.includes("NOT_FOUND")) {
+      showToast('Key lacks Generative Language permission. Use a key from Google AI Studio (not Cloud Console).');
+      setTimeout(openKeyModal, 1200);
+    }
+    throw new Error(errorMsg);
+  }
   return data;
 }
 
@@ -675,12 +977,12 @@ function onQK(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();sendQ()
 function autoH(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
 function addBbl(type,text){
   const h=g('chist'),d=ce('div');d.className=`cbbl ${type}`;
-  d.innerHTML=`<span class="clbl">${type==='q'?'You':'CodeVision AI'}</span><div class="ccnt">${e(text).replace(/\n/g,'<br>')}</div>`;
+  d.innerHTML=`<span class="clbl">${type==='q'?'You':'Codeyy AI'}</span><div class="ccnt">${e(text).replace(/\n/g,'<br>')}</div>`;
   h.appendChild(d);h.scrollTop=h.scrollHeight;return d;
 }
 function addThink(){
   const h=g('chist'),d=ce('div');d.className='cbbl a';
-  d.innerHTML=`<span class="clbl">CodeVision AI</span><div class="thinking"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  d.innerHTML=`<span class="clbl">Codeyy AI</span><div class="thinking"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
   h.appendChild(d);h.scrollTop=h.scrollHeight;return d;
 }
 
@@ -697,6 +999,65 @@ function hide(id){g(id)?.classList.add('hidden');}
 function g(id){return document.getElementById(id);}
 function ce(t){return document.createElement(t);}
 function e(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+
+// API Key Modal management functions
+function openKeyModal() {
+  const modal = g('keyModal');
+  const input = g('keyInput');
+  input.value = localStorage.getItem('gemini_api_key') || '';
+  modal.classList.remove('hidden');
+  input.focus();
+}
+
+function closeKeyModal() {
+  const key = localStorage.getItem('gemini_api_key');
+  if (!key || !(key.startsWith('AIzaSy') || key.startsWith('AQ.'))) {
+    showToast('Please enter a valid Gemini API Key to proceed.');
+    return;
+  }
+  g('keyModal').classList.add('hidden');
+}
+
+async function saveKey() {
+  const val = g('keyInput').value.trim();
+  if (val) {
+    localStorage.setItem('gemini_api_key', val);
+    showToast('✓ Saving API Key...');
+    try {
+      const res = await fetch(`${API}/api/key`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ api_key: val })
+      });
+      if (res.ok) {
+        showToast('✓ Gemini API Key saved');
+      } else {
+        showToast('⚠ Saved locally, but failed to save to server');
+      }
+    } catch (err) {
+      showToast('⚠ Saved locally, but server was unreachable');
+    }
+  } else {
+    localStorage.removeItem('gemini_api_key');
+    showToast('Gemini API Key removed. Clearing server key.');
+    try {
+      await fetch(`${API}/api/key`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ api_key: '' })
+      });
+    } catch (err) {
+      console.error('Failed to clear API key on server:', err);
+    }
+  }
+  closeKeyModal();
+  await checkHealth();
+}
+
+function toggleKeyVisibility() {
+  const input = g('keyInput');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
 </script>
 </body>
 </html>
