@@ -1,4 +1,4 @@
-# Codeyy 🚀 — AI Code Analysis Made Easy!
+# Codeyy 🚀 - AI Code Analysis Made Easy!
 
 Welcome to **Codeyy**, a simple and powerful tool designed to make coding easier for everyone. Whether you want to understand how a piece of code works, find bugs, or see how variables change step-by-step, Codeyy has got you covered!
 
