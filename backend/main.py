@@ -75,14 +75,28 @@ async def health(request: Request):
     })
 
 @app.get("/api/key")
-async def get_api_key():
+async def get_api_key(request: Request):
+    client_host = request.client.host if request.client else ""
+    is_local = client_host in ("127.0.0.1", "localhost", "::1")
+    is_render = os.getenv("RENDER") == "true"
+    
+    if is_render or not is_local:
+        return JSONResponse({"api_key": ""})
+        
     key = os.getenv("GEMINI_API_KEY", "").strip()
     if not key or not (key.startswith("AIzaSy") or key.startswith("AQ.")):
         return JSONResponse({"api_key": ""})
     return JSONResponse({"api_key": key})
 
 @app.post("/api/key")
-async def save_api_key(req: KeyConfigRequest):
+async def save_api_key(req: KeyConfigRequest, request: Request):
+    client_host = request.client.host if request.client else ""
+    is_local = client_host in ("127.0.0.1", "localhost", "::1")
+    is_render = os.getenv("RENDER") == "true"
+    
+    if is_render or not is_local:
+        return JSONResponse({"status": "error", "message": "API key modification not allowed on public deployments"})
+        
     new_key = req.api_key.strip()
     env_path = Path(__file__).parent / ".env"
     
