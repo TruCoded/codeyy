@@ -671,7 +671,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <div class="toast hidden" id="toast"></div>
 
 <script>
-const API = '';
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'http://127.0.0.1:8000';
 let curCode='',curLang='python';
 let imgB64=null,imgMime='image/png';
 let mode='code';
