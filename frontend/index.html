@@ -638,11 +638,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </section>
 </main>
 
-<!-- API Key Modal -->
+<!-- Settings Modal -->
 <div id="keyModal" class="kmodal hidden">
   <div class="kmodal-content">
     <div class="kmodal-header">
-      <h3>🔑 Configure Gemini API Key</h3>
+      <h3>⚙️ Configure Settings</h3>
       <button class="kmodal-close" onclick="closeKeyModal()">✕</button>
     </div>
     <div class="kmodal-body">
@@ -661,9 +661,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           Get a FREE Gemini API Key from Google AI Studio ↗
         </a>
       </div>
+      
+      <div class="kmodal-field" style="margin-top: 18px;">
+        <label for="apiUrlInput">Backend API URL</label>
+        <div class="key-input-container">
+          <input type="text" id="apiUrlInput" placeholder="http://127.0.0.1:8000" spellcheck="false" autocomplete="off" style="font-family: var(--fb);" />
+        </div>
+        <p style="font-size: 0.64rem; color: var(--tx3); margin-top: 4px; line-height: 1.4;">
+          Default: local backend. If Vercel blocks connection to 127.0.0.1, enter a secure tunnel URL (e.g. ngrok). Keep blank to use default.
+        </p>
+      </div>
     </div>
     <div class="kmodal-footer">
-      <button class="kmodal-btn btn-primary" onclick="saveKey()">Save Key</button>
+      <button class="kmodal-btn btn-primary" onclick="saveKey()">Save Settings</button>
     </div>
   </div>
 </div>
@@ -671,7 +681,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <div class="toast hidden" id="toast"></div>
 
 <script>
-const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'http://127.0.0.1:8000';
+let API = localStorage.getItem('codeyy_api_url') || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'http://127.0.0.1:8000');
 let curCode='',curLang='python';
 let imgB64=null,imgMime='image/png';
 let mode='code';
@@ -1005,6 +1015,12 @@ function openKeyModal() {
   const modal = g('keyModal');
   const input = g('keyInput');
   input.value = localStorage.getItem('gemini_api_key') || '';
+  
+  const urlInput = g('apiUrlInput');
+  if (urlInput) {
+    urlInput.value = localStorage.getItem('codeyy_api_url') || '';
+  }
+  
   modal.classList.remove('hidden');
   input.focus();
 }
@@ -1020,9 +1036,19 @@ function closeKeyModal() {
 
 async function saveKey() {
   const val = g('keyInput').value.trim();
+  const urlVal = g('apiUrlInput').value.trim();
+  
+  if (urlVal) {
+    localStorage.setItem('codeyy_api_url', urlVal);
+    API = urlVal;
+  } else {
+    localStorage.removeItem('codeyy_api_url');
+    API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'http://127.0.0.1:8000';
+  }
+
   if (val) {
     localStorage.setItem('gemini_api_key', val);
-    showToast('✓ Saving API Key...');
+    showToast('✓ Saving Settings...');
     try {
       const res = await fetch(`${API}/api/key`, {
         method: 'POST',
@@ -1030,7 +1056,7 @@ async function saveKey() {
         body: JSON.stringify({ api_key: val })
       });
       if (res.ok) {
-        showToast('✓ Gemini API Key saved');
+        showToast('✓ Settings saved successfully');
       } else {
         showToast('⚠ Saved locally, but failed to save to server');
       }
