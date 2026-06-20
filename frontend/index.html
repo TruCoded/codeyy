@@ -662,13 +662,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         </a>
       </div>
       
-      <div class="kmodal-field" style="margin-top: 18px;">
+      <div class="kmodal-field hidden" style="margin-top: 18px;">
         <label for="apiUrlInput">Backend API URL</label>
         <div class="key-input-container">
           <input type="text" id="apiUrlInput" placeholder="http://127.0.0.1:8000" spellcheck="false" autocomplete="off" style="font-family: var(--fb);" />
         </div>
         <p style="font-size: 0.64rem; color: var(--tx3); margin-top: 4px; line-height: 1.4;">
-          Default: https://codeyy.onrender.com (on Vercel) or local backend (on localhost). Keep blank to use default.
+          Default: https://codeyy-zw7z.onrender.com (on Vercel) or local backend (on localhost). Keep blank to use default.
         </p>
       </div>
     </div>
@@ -681,7 +681,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <div class="toast hidden" id="toast"></div>
 
 <script>
-const DEPLOYED_BACKEND_URL = 'https://codeyy.onrender.com';
+const DEPLOYED_BACKEND_URL = 'https://codeyy-zw7z.onrender.com';
 let API = localStorage.getItem('codeyy_api_url') || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : DEPLOYED_BACKEND_URL);
 let curCode='',curLang='python';
 let imgB64=null,imgMime='image/png';
@@ -1022,7 +1022,7 @@ function openKeyModal() {
     urlInput.value = localStorage.getItem('codeyy_api_url') || '';
     urlInput.placeholder = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? 'http://127.0.0.1:8000 (Default)'
-      : 'https://codeyy.onrender.com (Default)';
+      : 'https://codeyy-zw7z.onrender.com (Default)';
   }
   
   modal.classList.remove('hidden');
