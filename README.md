@@ -10,7 +10,7 @@ Instead of generating code, Codeyy focuses on helping users understand how code 
 
 ## 🎥 Demo
 
-
+![Codeyy Demo](codeyy.gif)
 
 ---
 
