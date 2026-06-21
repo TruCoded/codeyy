@@ -1,6 +1,6 @@
 # 🚀 Codeyy
 
-### Understand Any Codebase in Seconds
+### Understand, Debug & Learn From Code Faster
 
 Codeyy is an AI-powered code analysis platform that helps students and developers understand, debug, and learn from code through line-by-line explanations, execution tracing, complexity analysis, screenshot-to-code extraction, and contextual AI assistance.
 
@@ -16,7 +16,24 @@ Instead of generating code, Codeyy focuses on helping users understand how code 
 
 ## 🌐 Live Demo
 
-🔗 **Try Codeyy:** (https://codeyy-gamma.vercel.app/)
+🔗 **Try Codeyy:** https://codeyy-gamma.vercel.app/
+
+---
+
+## 🔥 What Makes Codeyy Different?
+
+Unlike traditional AI chatbots, Codeyy combines code understanding, debugging, execution tracing, and learning-focused analysis into a single workflow.
+
+Instead of simply generating answers, it helps users understand how code works through:
+
+- Line-by-line explanations
+- Interactive execution tracing
+- Bug detection and fixes
+- Complexity analysis
+- Screenshot-to-code extraction
+- Context-aware follow-up discussions
+
+Built for students, learners, and developers who want to understand code, not just generate it.
 
 ---
 
@@ -36,9 +53,11 @@ Instead of generating code, Codeyy focuses on helping users understand how code 
 
 ## 🎯 Why Codeyy?
 
-Developers frequently encounter unfamiliar code, debugging challenges, and complex logic that can be difficult to understand quickly.
+Reading code is often harder than writing it.
 
-Codeyy reduces the time spent deciphering code by providing structured explanations, execution traces, and learning-focused insights in a single workflow.
+Whether you're learning a new language, preparing for interviews, debugging assignments, or understanding someone else's project, the biggest challenge is understanding what the code is actually doing.
+
+Codeyy helps bridge that gap with explanations, execution traces, complexity insights, and interactive analysis in one place.
 
 ---
 
@@ -59,16 +78,14 @@ B --> A
 
 Building Codeyy involved solving several practical engineering challenges:
 
-* Handling inconsistent AI outputs and ensuring analysis remained structured and readable.
-* Managing communication between the Vercel frontend and Render-hosted FastAPI backend.
-* Resolving deployment issues, CORS conflicts, and environment configuration problems.
-* Integrating Google Gemini while handling API failures, formatting inconsistencies, and response validation.
-* Building reliable screenshot-to-code workflows for different image qualities and formats.
-* Supporting multiple programming languages while maintaining accurate analysis results.
-* Debugging frontend-backend synchronization issues during rapid feature development.
-* Managing merge conflicts and maintaining code consistency while iterating quickly.
-* Improving response quality without significantly increasing analysis latency.
-
+- Handling inconsistent AI responses and converting them into structured, predictable outputs.
+- Maintaining reliable communication between the Vercel frontend and Render-hosted FastAPI backend.
+- Resolving deployment, CORS, and environment configuration issues across different services.
+- Integrating Gemini while handling API errors, rate limits, and response formatting inconsistencies.
+- Building screenshot-to-code workflows that work across different image qualities and layouts.
+- Supporting multiple programming languages without sacrificing analysis accuracy.
+- Designing execution traces that remain easy to understand for beginners.
+- Balancing response quality, speed, and API costs.
 ---
 
 ## 📚 Roadmap
