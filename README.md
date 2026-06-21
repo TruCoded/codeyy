@@ -88,11 +88,10 @@ Building Codeyy involved solving several practical engineering challenges:
 
 ## 🛠️ Tech Stack
 
-""Frontend" (https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JavaScript-blue)"
-""Backend" (https://img.shields.io/badge/Backend-FastAPI-green)"
-""AI" (https://img.shields.io/badge/AI-Google%20Gemini-orange)"
-""Deployment" (https://img.shields.io/badge/Deployment-Vercel%20%7C%20Render-purple)"
-
+![Frontend](https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JavaScript-blue)
+![Backend](https://img.shields.io/badge/Backend-FastAPI-green)
+![AI](https://img.shields.io/badge/AI-Google%20Gemini-orange)
+![Deployment](https://img.shields.io/badge/Deployment-Vercel%20%7C%20Render-purple)
 ---
 
 ## ⭐ Support
