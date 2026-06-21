@@ -1,38 +1,96 @@
-# Codeyy 🚀 - AI Code Analysis Made Easy!
+# 🚀 Codeyy
 
-Welcome to **Codeyy**, a simple and powerful tool designed to make coding easier for everyone. Whether you want to understand how a piece of code works, find bugs, or see how variables change step-by-step, Codeyy has got you covered!
+### Understand Any Codebase in Seconds
+
+Codeyy is an AI-powered code analysis platform that helps students and developers understand, debug, and learn from code through line-by-line explanations, execution tracing, complexity analysis, screenshot-to-code extraction, and contextual AI assistance.
+
+Instead of generating code, Codeyy focuses on helping users understand how code actually works.
+
+---
+
+## 🎥 Demo
+
+
+
+---
+
+## 🌐 Live Demo
+
+🔗 **Try Codeyy:** (https://codeyy-gamma.vercel.app/)
 
 ---
 
 ## ✨ Features
-* **Line-by-Line Explanations**: Understand what every line of code does in plain English.
-* **Bug Detection & Fixes**: Instantly find bugs and errors, and get clean, corrected code.
-* **Dry Run Execution Trace**: Walk through your code step-by-step to see how variables change.
-* **Complexity Analysis**: Learn how fast your code runs (Time & Space complexity).
-* **Screenshot Analysis**: Upload a picture or screenshot of your code, and Codeyy will extract the code and analyze it for you!
-* **Follow-up Chatbot**: Ask questions about your code right inside the app!
+
+| Feature                     | Description                                              |
+| --------------------------- | -------------------------------------------------------- |
+| 📝 Line-by-Line Explanation | Understand what every line of code does in plain English |
+| 🐞 Bug Detection            | Identify errors and receive suggested fixes              |
+| ⚡ Complexity Analysis       | Generate Time and Space Complexity insights              |
+| 🔍 Execution Trace          | Follow variable changes step-by-step                     |
+| 📸 Screenshot Analysis      | Extract and analyze code directly from images            |
+| 🤖 Context-Aware Chat       | Ask follow-up questions about analyzed code              |
+| 🌎 Multi-Language Support   | Analyze code across multiple programming languages       |
 
 ---
 
-## 🛠️ The Tech Stack (What makes it run?)
-* **Frontend**: HTML, CSS, and JavaScript (the visual website you see and interact with).
-* **Backend**: Python and FastAPI (the engine that passes code to the AI).
-* **AI Core**: Google Gemini (the brain that reads and explains your code).
-* **Hosting**: Vercel (for the website) and Render (for the backend engine).
+## 🎯 Why Codeyy?
+
+Developers frequently encounter unfamiliar code, debugging challenges, and complex logic that can be difficult to understand quickly.
+
+Codeyy reduces the time spent deciphering code by providing structured explanations, execution traces, and learning-focused insights in a single workflow.
 
 ---
 
-## 🚀 How to Use Codeyy (Easy Steps)
+## 🏗️ Architecture
 
-### For Website Users:
-1. Open the deployed website link.
-2. Click the **Settings Gear Icon** at the top right.
-3. Paste your free **Gemini API Key** from Google AI Studio and save.
-4. Paste your code (or upload a screenshot), choose your programming language, and click **Analyze Code**!
+User → Frontend (HTML/CSS/JS) → FastAPI Backend → Gemini API → Analysis Engine → Results Dashboard
 
-### For Running Locally on Your Computer:
-We have made running the app locally as simple as possible. No setup required!
-* **Windows Users**: Just double-click the `start_windows.bat` file in the folder.
-* **Mac & Linux Users**: Open your terminal in this folder and run `start_mac_linux.sh`.
+---
 
-The application will start automatically in your browser. Have fun coding!
+## ⚔️ Challenges Faced
+
+Building Codeyy involved solving several practical engineering challenges:
+
+* Handling inconsistent AI outputs and ensuring analysis remained structured and readable.
+* Managing communication between the Vercel frontend and Render-hosted FastAPI backend.
+* Resolving deployment issues, CORS conflicts, and environment configuration problems.
+* Integrating Google Gemini while handling API failures, formatting inconsistencies, and response validation.
+* Building reliable screenshot-to-code workflows for different image qualities and formats.
+* Supporting multiple programming languages while maintaining accurate analysis results.
+* Debugging frontend-backend synchronization issues during rapid feature development.
+* Managing merge conflicts and maintaining code consistency while iterating quickly.
+* Improving response quality without significantly increasing analysis latency.
+
+---
+
+## 📚 Roadmap
+
+### Upcoming
+
+* Automatic language detection
+* AI-powered code commenting
+* Visual execution engine
+* Interactive flowcharts
+* DSA concept detection
+* Interview preparation mode
+* Learning dashboard
+* VS Code extension
+
+---
+
+## 🛠️ Tech Stack
+
+Frontend: HTML, CSS, JavaScript
+
+Backend: Python, FastAPI
+
+AI: Google Gemini
+
+Deployment: Vercel, Render
+
+---
+
+## ⭐ Support
+
+If you found Codeyy useful, consider starring the repository and sharing feedback.
