@@ -44,8 +44,15 @@ Codeyy reduces the time spent deciphering code by providing structured explanati
 
 ## 🏗️ Architecture
 
-User → Frontend (HTML/CSS/JS) → FastAPI Backend → Gemini API → Analysis Engine → Results Dashboard
-
+```mermaid
+graph TD
+A[User] --> B[Frontend]
+B --> C[FastAPI Backend]
+C --> D[Google Gemini]
+D --> C
+C --> B
+B --> A
+```
 ---
 
 ## ⚔️ Challenges Faced
@@ -81,13 +88,10 @@ Building Codeyy involved solving several practical engineering challenges:
 
 ## 🛠️ Tech Stack
 
-Frontend: HTML, CSS, JavaScript
-
-Backend: Python, FastAPI
-
-AI: Google Gemini
-
-Deployment: Vercel, Render
+""Frontend" (https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JavaScript-blue)"
+""Backend" (https://img.shields.io/badge/Backend-FastAPI-green)"
+""AI" (https://img.shields.io/badge/AI-Google%20Gemini-orange)"
+""Deployment" (https://img.shields.io/badge/Deployment-Vercel%20%7C%20Render-purple)"
 
 ---
 
