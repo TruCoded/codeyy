@@ -15,7 +15,7 @@ from typing import Optional
 import base64
 import traceback
 
-from ai_service import analyze_code, ask_followup, extract_code_from_image
+from ai_service import analyze_code, ask_followup, extract_code_from_image, refactor_code, generate_comments_for_code
 
 app = FastAPI(title="Codeyy (Gemini)", version="4.1.0")
 
@@ -58,6 +58,15 @@ class AskRequest(BaseModel):
 
 class KeyConfigRequest(BaseModel):
     api_key: str
+
+class RefactorRequest(BaseModel):
+    code:              str
+    language:          str
+    target_complexity: str
+
+class CommentsRequest(BaseModel):
+    code:              str
+    language:          str
 
 
 # ── Health ──────────────────────────────────────────────────────────────────
@@ -175,3 +184,44 @@ async def ask(req: AskRequest, request: Request):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(500, f"Q&A error: {e}")
+
+
+# ── /refactor ───────────────────────────────────────────────────────────────
+
+@app.post("/refactor")
+async def refactor(req: RefactorRequest, request: Request):
+    code = req.code.strip()
+    if not code:
+        raise HTTPException(400, "No code provided.")
+    user_key = request.headers.get("X-Gemini-API-Key", "")
+    try:
+        result = await refactor_code(
+            code,
+            req.language,
+            req.target_complexity,
+            api_key=user_key,
+        )
+        return JSONResponse(result)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(500, f"Refactoring error: {e}")
+
+
+# ── /comments ───────────────────────────────────────────────────────────────
+
+@app.post("/comments")
+async def comments(req: CommentsRequest, request: Request):
+    code = req.code.strip()
+    if not code:
+        raise HTTPException(400, "No code provided.")
+    user_key = request.headers.get("X-Gemini-API-Key", "")
+    try:
+        result = await generate_comments_for_code(
+            code,
+            req.language,
+            api_key=user_key,
+        )
+        return JSONResponse(result)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(500, f"Comment generation error: {e}")

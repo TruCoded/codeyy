@@ -58,11 +58,16 @@ async def detect_language(code: str, api_key: str = None) -> str:
 
 def get_mega_prompt(code: str, lang: str) -> str:
     lines = "\n".join(f"Line {i+1}: {l}" for i, l in enumerate(code.split("\n")))
-    return f"""You are a senior {lang} engineer. Analyze this code.
+    engineer_role = f"senior {lang} engineer" if lang and lang.lower() != "auto" else "senior software engineer"
+    return f"""You are a {engineer_role}. Analyze this code.
 Output your analysis using ONLY these tagged sections:
 
 CODE:
 {lines}
+
+DETECTED_LANGUAGE_START
+[Output ONLY the lowercase identifier of the programming language, e.g. python, javascript, typescript, cpp, c, java, rust, go, html, css, ruby, php, etc.]
+DETECTED_LANGUAGE_END
 
 LINE_EXPLANATIONS_START
 [For EVERY line: Line N: code | Explanation: 1 sentence]
@@ -79,6 +84,10 @@ CORRECTED_CODE_END
 DRY_RUN_START
 [Trace execution: STEP_N: Line N | Action | Variables. End with RESULT: value]
 DRY_RUN_END
+
+FLOWCHART_START
+[Generate a Mermaid.js control flow diagram (graph TD) showing the execution flow of the code. Keep it simple and use valid Mermaid graph syntax.]
+FLOWCHART_END
 
 TIME_COMPLEXITY_START
 [Big-O and 1 sentence]
@@ -111,10 +120,12 @@ async def analyze_code(code: str, language: str, api_key: str = None) -> dict:
             response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
             r = response.text
             return {
+                "detected_language": _extract(r, "DETECTED_LANGUAGE_START", "DETECTED_LANGUAGE_END"),
                 "line_explanations": _extract(r, "LINE_EXPLANATIONS_START", "LINE_EXPLANATIONS_END"),
                 "bug_detection":     _extract(r, "BUG_DETECTION_START",     "BUG_DETECTION_END"),
                 "corrected_code":    _extract(r, "CORRECTED_CODE_START",    "CORRECTED_CODE_END"),
                 "dry_run":           _extract(r, "DRY_RUN_START",           "DRY_RUN_END"),
+                "flowchart":         _extract(r, "FLOWCHART_START",         "FLOWCHART_END"),
                 "time_complexity":   _extract(r, "TIME_COMPLEXITY_START",   "TIME_COMPLEXITY_END"),
                 "space_complexity":  _extract(r, "SPACE_COMPLEXITY_START",  "SPACE_COMPLEXITY_END"),
                 "suggestions":       _extract(r, "SUGGESTIONS_START",       "SUGGESTIONS_END"),
@@ -124,6 +135,67 @@ async def analyze_code(code: str, language: str, api_key: str = None) -> dict:
                 await asyncio.sleep(5)
             else:
                 raise e
+
+
+async def refactor_code(code: str, language: str, target_complexity: str, api_key: str = None) -> dict:
+    async def _call():
+        client = get_client(api_key)
+        prompt = f"""You are a senior {language} engineer. Refactor the following code to achieve a target complexity of: {target_complexity}.
+If it's already at that complexity or cannot be refactored further, optimize it as much as possible while explaining why.
+
+Output your response using ONLY these tagged sections:
+
+REFACTORED_CODE_START
+[Output ONLY the complete, optimized/refactored code. No Markdown code block fences.]
+REFACTORED_CODE_END
+
+EXPLANATION_START
+[Provide a clear, brief explanation of the changes made and how they achieve the target complexity, or why they could not.]
+EXPLANATION_END
+
+Code to refactor:
+{code}"""
+        try:
+            response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
+            r = response.text
+            return {
+                "refactored_code": _extract(r, "REFACTORED_CODE_START", "REFACTORED_CODE_END"),
+                "explanation": _extract(r, "EXPLANATION_START", "EXPLANATION_END")
+            }
+        except Exception as e:
+            print(f"Error in refactor_code: {e}")
+            raise e
+    return await _call()
+
+
+async def generate_comments_for_code(code: str, language: str, api_key: str = None) -> dict:
+    async def _call():
+        client = get_client(api_key)
+        prompt = f"""You are a senior {language} engineer. Add detailed, professional docstrings, function headers, and clear inline comments explaining complex logic in the code. Keep the code structure and behavior exactly the same.
+
+Output your response using ONLY these tagged sections:
+
+COMMENTED_CODE_START
+[Output ONLY the complete commented code. Do not use Markdown code block fences.]
+COMMENTED_CODE_END
+
+EXPLANATION_START
+[Briefly summarize the comments and documentation standards added.]
+EXPLANATION_END
+
+Code:
+{code}"""
+        try:
+            response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
+            r = response.text
+            return {
+                "commented_code": _extract(r, "COMMENTED_CODE_START", "COMMENTED_CODE_END"),
+                "explanation": _extract(r, "EXPLANATION_START", "EXPLANATION_END")
+            }
+        except Exception as e:
+            print(f"Error in generate_comments_for_code: {e}")
+            raise e
+    return await _call()
 
 
 async def ask_followup(question: str, code: str, language: str, history: list, api_key: str = None) -> str:
