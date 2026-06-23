@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from typing import Optional
 import base64
 import traceback
+import asyncio
 
 from ai_service import analyze_code, ask_followup, extract_code_from_image, refactor_code, generate_comments_for_code
 
@@ -75,13 +76,40 @@ class CommentsRequest(BaseModel):
 async def health(request: Request):
     header_key = request.headers.get("X-Gemini-API-Key", "")
     key = (header_key or os.getenv("GEMINI_API_KEY", "")).strip()
-    ok  = bool(key and len(key) > 10 and (key.startswith("AIzaSy") or key.startswith("AQ.")))
-    return JSONResponse({
-        "ok":         ok,
-        "key_prefix": key[:12] + "…" if (ok and len(key) >= 12) else "NOT SET",
-        "model":      "gemini-1.5-flash",
-        "version":    "4.1.0",
-    })
+    
+    if not key or len(key) <= 10 or not (key.startswith("AIzaSy") or key.startswith("AQ.")):
+        return JSONResponse({
+            "ok":         False,
+            "key_prefix": "NOT SET",
+            "error":      "API key missing or format is invalid.",
+            "model":      "gemini-2.5-flash",
+            "version":    "4.1.0",
+        })
+        
+    try:
+        from ai_service import get_client, MODEL_NAME
+        client = get_client(key)
+        # Lightweight check: send a simple generation request to verify the key works
+        await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents="Ping")
+        return JSONResponse({
+            "ok":         True,
+            "key_prefix": key[:12] + "…" if len(key) >= 12 else key,
+            "model":      MODEL_NAME,
+            "version":    "4.1.0",
+        })
+    except Exception as e:
+        error_msg = str(e)
+        if "API_KEY_INVALID" in error_msg or "invalid" in error_msg.lower():
+            error_msg = "Invalid API Key. Please configure a valid Gemini API key."
+        elif "expired" in error_msg.lower():
+            error_msg = "API Key expired. Please configure a new Gemini API key."
+        return JSONResponse({
+            "ok":         False,
+            "key_prefix": key[:12] + "…" if len(key) >= 12 else key,
+            "error":      f"API Key validation failed: {error_msg}",
+            "model":      "gemini-2.5-flash",
+            "version":    "4.1.0",
+        })
 
 @app.get("/api/key")
 async def get_api_key(request: Request):

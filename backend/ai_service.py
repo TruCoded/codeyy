@@ -171,7 +171,9 @@ Code to refactor:
 async def generate_comments_for_code(code: str, language: str, api_key: str = None) -> dict:
     async def _call():
         client = get_client(api_key)
-        prompt = f"""You are a senior {language} engineer. Add detailed, professional docstrings, function headers, and clear inline comments explaining complex logic in the code. Keep the code structure and behavior exactly the same.
+        prompt = f"""You are a senior {language} engineer. Add concise, high-quality, humanoid inline comments and brief docstrings explaining ONLY the essential or complex logic in the code.
+Do NOT write bulky, verbose, or redundant comments on every line. Keep the code clean and readable.
+IMPORTANT: The comments added must be extremely natural and minimal (limit to at most 15 lines of comments in total). Keep the code structure and behavior exactly the same.
 
 Output your response using ONLY these tagged sections:
 

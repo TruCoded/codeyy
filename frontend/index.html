@@ -1967,7 +1967,6 @@
       <div class="ph">
         <span class="plbl">✦ Input</span>
         <div class="lang-row">
-          <button class="detect-btn" id="detectBtn" onclick="detectLang()">⚡ Auto-detect</button>
           <div class="sel-wr">
             <select class="lang-sel" id="langSel">
               <option value="auto">⚡ Auto-Detect</option>
@@ -2387,10 +2386,13 @@
         }
       }
 
-      await checkHealth();
+      const isHealthOk = await checkHealth();
 
-      if (!key) {
-        setTimeout(openKeyModal, 800);
+      if (!isHealthOk) {
+        const pillText = document.getElementById('spillTxt').textContent;
+        if (pillText !== 'Backend not running — start it first') {
+          setTimeout(openKeyModal, 800);
+        }
       }
     });
 
@@ -2408,10 +2410,15 @@
           } else {
             setPill('Gemini Ready (Server Key)', '');
           }
+          return true;
         } else {
-          setPill('API key missing — click settings icon to configure', 'err');
+          setPill(d.error || 'API key missing — click settings icon to configure', 'err');
+          return false;
         }
-      } catch { setPill('Backend not running — start it first', 'err'); }
+      } catch {
+        setPill('Backend not running — start it first', 'err');
+        return false;
+      }
     }
 
     function setPill(t, cls) {
@@ -2492,26 +2499,6 @@
         }
       }
       return null;
-    }
-
-    async function detectLang() {
-      const code = g('codeTA').value.trim();
-      if (!code) { showErr('Paste some code first.'); return; }
-      const btn = g('detectBtn');
-      btn.textContent = '⚡ Detecting…'; btn.disabled = true;
-      try {
-        const res = await post('/ask', { question: 'What programming language is this? Reply with ONLY the language name — nothing else.', code: code.slice(0, 2000), language: 'auto', conversation_history: [] });
-        const matched = matchLang(res.answer);
-        if (matched) {
-          g('langSel').value = matched;
-          curLang = matched;
-          localStorage.setItem('codeyy_last_lang', curLang);
-          g('edLang').textContent = g('langSel').options[g('langSel').selectedIndex].text;
-          showToast('✓ Detected: ' + g('langSel').options[g('langSel').selectedIndex].text);
-        }
-        else { showToast('Detected: ' + res.answer + ' — set manually if wrong'); }
-      } catch (e) { showErr('Detection failed: ' + e.message); }
-      finally { btn.textContent = '⚡ Auto-detect'; btn.disabled = false; }
     }
 
     async function runCommentGen() {
