@@ -2516,35 +2516,8 @@
         });
       }
 
-      // Fetch API key from backend
-      let key = '';
-      try {
-        const res = await fetch(`${API}/api/key`);
-        if (res.ok) {
-          const data = await res.json();
-          key = data.api_key || '';
-        }
-      } catch (err) {
-        console.error('Failed to fetch API key from backend:', err);
-      }
-
-      // Sync key with localStorage
-      if (key) {
-        localStorage.setItem('gemini_api_key', key);
-      } else {
-        key = localStorage.getItem('gemini_api_key') || '';
-        if (key) {
-          try {
-            await fetch(`${API}/api/key`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ api_key: key })
-            });
-          } catch (err) {
-            console.error('Failed to sync API key to backend:', err);
-          }
-        }
-      }
+      // Require local key validation
+      const userKey = localStorage.getItem('gemini_api_key') || '';
 
       const isHealthOk = await checkHealth();
 

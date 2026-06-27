@@ -117,52 +117,13 @@ async def health(request: Request):
 
 @app.get("/api/key")
 async def get_api_key(request: Request):
-    client_host = request.client.host if request.client else ""
-    is_local = client_host in ("127.0.0.1", "localhost", "::1")
-    is_render = os.getenv("RENDER") == "true"
-    
-    if is_render or not is_local:
-        return JSONResponse({"api_key": ""})
-        
-    key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not key or not (key.startswith("AIzaSy") or key.startswith("AQ.")):
-        return JSONResponse({"api_key": ""})
-    return JSONResponse({"api_key": key})
+    # Completely disabled to prevent leakage of the server API key to clients
+    return JSONResponse({"api_key": ""})
 
 @app.post("/api/key")
 async def save_api_key(req: KeyConfigRequest, request: Request):
-    client_host = request.client.host if request.client else ""
-    is_local = client_host in ("127.0.0.1", "localhost", "::1")
-    is_render = os.getenv("RENDER") == "true"
-    
-    if is_render or not is_local:
-        return JSONResponse({"status": "error", "message": "API key modification not allowed on public deployments"})
-        
-    new_key = req.api_key.strip()
-    env_path = Path(__file__).parent / ".env"
-    
-    content = ""
-    key_written = False
-    
-    if env_path.exists():
-        lines = env_path.read_text(encoding="utf-8").splitlines()
-        new_lines = []
-        for line in lines:
-            if line.strip().startswith("GEMINI_API_KEY="):
-                new_lines.append(f"GEMINI_API_KEY={new_key}")
-                key_written = True
-            else:
-                new_lines.append(line)
-        if not key_written:
-            new_lines.append(f"GEMINI_API_KEY={new_key}")
-        content = "\n".join(new_lines) + "\n"
-    else:
-        content = f"GEMINI_API_KEY={new_key}\n"
-        
-    env_path.write_text(content, encoding="utf-8")
-    os.environ["GEMINI_API_KEY"] = new_key
-    
-    return JSONResponse({"status": "ok", "message": "API key saved successfully"})
+    # Disabled so clients must store keys locally in their browser context only
+    return JSONResponse({"status": "error", "message": "API key persistence on server is disabled. Keys are stored in client browser localstorage only."})
 
 
 # ── /detect ─────────────────────────────────────────────────────────────────
