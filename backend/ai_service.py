@@ -60,7 +60,7 @@ def get_mega_prompt(code: str, lang: str) -> str:
     lines = "\n".join(f"Line {i+1}: {l}" for i, l in enumerate(code.split("\n")))
     engineer_role = f"senior {lang} engineer" if lang and lang.lower() != "auto" else "senior software engineer"
     return f"""You are a {engineer_role}. Analyze this code.
-Output your analysis using ONLY these tagged sections:
+Output your analysis using ONLY these tagged sections. You MUST include every single section block from DETECTED_LANGUAGE to VIVA_QUESTIONS in your output. Do not omit, merge, rename, or shorten any section. If a section is not applicable to the input code, write a brief explanation of why inside its tags.
 
 CODE:
 {lines}
@@ -82,11 +82,39 @@ CORRECTED_CODE_START
 CORRECTED_CODE_END
 
 DRY_RUN_START
-[Trace execution: STEP_N: Line N | Action | Variables. End with RESULT: value]
+[Provide a step-by-step trace execution of the code as a clean JSON array (no markdown code blocks, output raw valid JSON only). Each object in the array represents a single step in execution and must follow this structure:
+{{
+  "step": number (1-based index),
+  "line": number (line number currently executing),
+  "action": "clear humanoid explanation of what happens on this line in 1 short sentence",
+  "variables": {{ "variable_name": value, ... }},
+  "ds_type": "none" | "array" | "stack" | "queue" | "linkedlist" | "tree" | "graph" | "recursion",
+  "ds_data": [
+     // For array/stack/queue: current list of values, e.g. [12, 45, 9] or ["a", "b"]
+     // For linkedlist: nodes in sequence, e.g. [10, 20, 30]
+     // For recursion: current function call stack, e.g. ["fib(3)", "fib(2)"]
+     // For tree/graph: list of active parent-child relationships, e.g. [["A", "B"], ["A", "C"]]
+  ]
+}}
+End the array with a step representing the final return/output value.]
 DRY_RUN_END
 
 FLOWCHART_START
-[Generate a Mermaid.js control flow diagram (graph TD) showing the execution flow of the code. Keep it simple and use valid Mermaid graph syntax.]
+[Generate a beautiful, logical Mermaid.js control flow diagram (graph TD) showing the execution flow of the code. 
+Use clean shapes and semantic nodes:
+- Start/End steps: Use rounded brackets with double-quoted labels like `A("Start"):::startEnd` or `Z("End"):::startEnd`.
+- Conditionals/Decisions: Use brace nodes with double-quoted labels like `B{{"Is condition met?"}}:::decision` (write this with double curly braces) and label paths clearly using `-- Yes -->` or `-- No -->`.
+- Standard statements/process: Use square brackets with double-quoted labels like `C["Process/Action"]:::default`.
+
+CRITICAL SAFETY RULES FOR MERMAID:
+1. You MUST enclose all node labels inside double quotes (e.g. B{{"Is x > y?"}} or C["sum = a + b"]). Do NOT output unquoted text inside brackets or curly braces.
+2. Do NOT use parentheses `()`, braces `{{}}`, or square brackets `[]` inside the double quotes of a node label. Instead, describe the action in plain English (e.g. write `C["Find element in map"]` instead of `C["map.find(x)"]`).
+
+Include these class definitions in the flowchart output to apply our custom color theme:
+classDef default fill:#122858,stroke:#3ecfb2,stroke-width:1.5px,color:#f3f5ed;
+classDef decision fill:#0f2348,stroke:#c9a84c,stroke-width:1.5px,color:#c9a84c;
+classDef startEnd fill:#0c1e3a,stroke:#4a9eff,stroke-width:1.5px,color:#4a9eff;
+]
 FLOWCHART_END
 
 TIME_COMPLEXITY_START
@@ -99,7 +127,31 @@ SPACE_COMPLEXITY_END
 
 SUGGESTIONS_START
 [1-5 actionable tips]
-SUGGESTIONS_END"""
+SUGGESTIONS_END
+
+DSA_PATTERN_START
+[Identify the primary DSA patterns, algorithms, or data structures used in this code, e.g. Sliding Window, DFS, Hash Table, Stack, Binary Search. Provide 1-2 sentences explaining why this pattern fits the problem.]
+DSA_PATTERN_END
+
+LEETCODE_PROBLEMS_START
+[Suggest 3 related LeetCode problems that practice this pattern. For each, output: Title | Link (use standard https://leetcode.com/problems/... urls). Use newlines to separate.]
+LEETCODE_PROBLEMS_END
+
+PRACTICE_EXERCISES_START
+[Provide 3 practice questions (Beginner, Intermediate, Advanced) that build on this concept. For each, output the difficulty, aim, and a brief sample input/output. Use clean Markdown structure.]
+PRACTICE_EXERCISES_END
+
+INTERVIEW_QUESTIONS_START
+[Generate 3-5 technical interview questions an interviewer would ask about this code. Focus on edge cases, scaling limits, and structural design choices. List questions clearly.]
+INTERVIEW_QUESTIONS_END
+
+ALGORITHM_START
+[Provide a formal, step-by-step academic algorithm in English describing how this program executes (e.g. Step 1: Start, Step 2: Initialize variables, etc.).]
+ALGORITHM_END
+
+VIVA_QUESTIONS_START
+[Generate 5 classic oral exam (Viva Voce) questions that a college professor or lab examiner would ask about this code. For each question, output the Question and the Answer. Format them clearly with Q: and A: on newlines.]
+VIVA_QUESTIONS_END"""
 
 
 def _extract(text: str, start: str, end: str) -> str:
@@ -107,7 +159,11 @@ def _extract(text: str, start: str, end: str) -> str:
         s = text.index(start) + len(start)
         e = text.index(end)
         return text[s:e].strip()
-    except: return ""
+    except Exception as ex:
+        import sys
+        import traceback
+        print(f"Extraction failed for tags {start} -> {end}: {ex}", file=sys.stderr)
+        return ""
 
 
 async def analyze_code(code: str, language: str, api_key: str = None) -> dict:
@@ -129,6 +185,12 @@ async def analyze_code(code: str, language: str, api_key: str = None) -> dict:
                 "time_complexity":   _extract(r, "TIME_COMPLEXITY_START",   "TIME_COMPLEXITY_END"),
                 "space_complexity":  _extract(r, "SPACE_COMPLEXITY_START",  "SPACE_COMPLEXITY_END"),
                 "suggestions":       _extract(r, "SUGGESTIONS_START",       "SUGGESTIONS_END"),
+                "dsa_pattern":       _extract(r, "DSA_PATTERN_START",       "DSA_PATTERN_END"),
+                "leetcode_problems": _extract(r, "LEETCODE_PROBLEMS_START", "LEETCODE_PROBLEMS_END"),
+                "practice_exercises":_extract(r, "PRACTICE_EXERCISES_START", "PRACTICE_EXERCISES_END"),
+                "interview_questions":_extract(r, "INTERVIEW_QUESTIONS_START", "INTERVIEW_QUESTIONS_END"),
+                "algorithm":         _extract(r, "ALGORITHM_START",         "ALGORITHM_END"),
+                "viva_questions":    _extract(r, "VIVA_QUESTIONS_START",    "VIVA_QUESTIONS_END"),
             }
         except Exception as e:
             if "429" in str(e) and attempt == 0:
@@ -171,9 +233,13 @@ Code to refactor:
 async def generate_comments_for_code(code: str, language: str, api_key: str = None) -> dict:
     async def _call():
         client = get_client(api_key)
-        prompt = f"""You are a senior {language} engineer. Add concise, high-quality, humanoid inline comments and brief docstrings explaining ONLY the essential or complex logic in the code.
-Do NOT write bulky, verbose, or redundant comments on every line. Keep the code clean and readable.
-IMPORTANT: The comments added must be extremely natural and minimal (limit to at most 15 lines of comments in total). Keep the code structure and behavior exactly the same.
+        prompt = f"""You are a senior {language} software engineer. Your task is to add sparse, extremely natural, humanoid inline comments and brief docstrings to the code.
+Follow these strict rules to keep the comments clean and professional:
+1. Do NOT explain what the language syntax does (e.g., do not write `# loop over items` for a loop, or `# initialize variables`).
+2. Only add inline comments to explain the "WHY" behind non-obvious logic, tricky mathematical calculations, complex regex, edge case handling, or subtle algorithm choices.
+3. Use a casual, expert human developer tone. Write like a real programmer writing a note to their teammate.
+4. Keep comments brief and minimal. Limit comments to at most 5-10 short lines across the entire file.
+5. The code structure, variables, and behavior must remain 100% identical. Do not add markdown code fences around the output code.
 
 Output your response using ONLY these tagged sections:
 
@@ -200,9 +266,28 @@ Code:
     return await _call()
 
 
-async def ask_followup(question: str, code: str, language: str, history: list, api_key: str = None) -> str:
+async def ask_followup(question: str, code: str, language: str, history: list, api_key: str = None, interview_mode: bool = False) -> str:
     client = get_client(api_key)
-    ctx = f"Senior {language} engineer. Code:\n{code}"
+    if interview_mode:
+        ctx = (
+            f"You are a strict, professional technical interviewer from a top-tier tech company.\n"
+            f"The candidate has uploaded this code context:\n{code}\n\n"
+            "Follow these rules for the conversation:\n"
+            "1. Conduct a realistic coding mock interview. Ask technical questions about their choices, edge cases, or potential bottlenecks.\n"
+            "2. Keep your questions and responses extremely short and focused (1-2 sentences max). Do not explain solutions or help them unless they ask for hints.\n"
+            "3. Evaluate the candidate's answers critically. If they answer incorrectly, guide them with small hints.\n"
+            "4. If they ask to wrap up or finish, give them a final constructive score and detailed feedback."
+        )
+    else:
+        ctx = (
+            f"You are an expert {language} software engineer assisting a developer.\n"
+            f"Here is the active context code:\n{code}\n\n"
+            "Follow these rules for your response:\n"
+            "1. Be extremely direct, concise, and to-the-point. Answer the user's query immediately.\n"
+            "2. Do NOT include conversational filler, greetings, or polite transitions (e.g. 'Sure, I can explain that...', 'Here is the code:').\n"
+            "3. Focus on explaining ONLY what was asked. Do not give general tutorials or explain basic syntax unless explicitly requested.\n"
+            "4. Keep formatting clean and readable using standard Markdown. Keep paragraphs brief."
+        )
     chats = []
     for t in history[-4:]:
         if t.get("question"): chats.append({"role": "user", "parts": [{"text": t["question"]}]})

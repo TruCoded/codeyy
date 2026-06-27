@@ -7,6 +7,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Codeyy — AI Code Analysis</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -403,12 +405,12 @@
     .ed-bar {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 12px;
       background: var(--bg3);
       border: 1px solid var(--b1);
       border-bottom: none;
       border-radius: var(--r2) var(--r2) 0 0;
-      padding: 7px 11px
+      padding: 8px 12px
     }
 
     .dots {
@@ -479,7 +481,19 @@
       user-select: none;
       min-width: 38px;
       overflow: hidden;
-      white-space: pre
+    }
+
+    .ln-num-item {
+      line-height: 1.65;
+      padding: 0 4px;
+      transition: all 0.2s;
+    }
+
+    .ln-num-item.active {
+      color: var(--teal) !important;
+      background: var(--teal2);
+      font-weight: bold;
+      border-radius: 3px;
     }
 
     .code-ta {
@@ -895,7 +909,9 @@
       font-weight: 700;
       letter-spacing: .13em;
       text-transform: uppercase;
-      color: var(--tx3)
+      color: var(--tx3);
+      margin-top: 18px;
+      margin-bottom: 10px;
     }
 
     .sd {
@@ -1931,6 +1947,95 @@
       color: var(--blue);
       border: 1px solid rgba(74, 158, 255, 0.2);
     }
+
+    /* Custom Mermaid CSS Overrides for Premium Aesthetic */
+    .mermaid svg {
+      font-family: var(--fb) !important;
+    }
+    .mermaid .edgePath .path {
+      stroke: var(--tx3) !important;
+      stroke-width: 1.5px !important;
+    }
+    .mermaid .edgeLabel {
+      background-color: var(--bgi) !important;
+      color: var(--tx2) !important;
+      font-size: 0.62rem !important;
+      padding: 1px 4px !important;
+      border-radius: 4px !important;
+    }
+    .mermaid .marker {
+      fill: var(--tx3) !important;
+      stroke: var(--tx3) !important;
+    }
+    .mermaid .nodeLabel {
+      font-size: 0.72rem !important;
+      font-family: var(--fm) !important;
+    }
+
+    /* Premium UI/UX Hover Transitions & Micro-animations */
+    .otab, .mtab, .drbtn, .abtn, .cpybtn, .rm-img, .kmodal-btn, .lang-sel {
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    }
+
+    .otab:hover, .mtab:hover, .drbtn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      color: var(--tx1) !important;
+    }
+
+    .cxcard, .sitem, .bitem, .lni {
+      transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    }
+
+    .cxcard:hover, .sitem:hover {
+      transform: translateY(-2.5px);
+      box-shadow: 0 8px 24px rgba(201, 168, 76, 0.12);
+      border-color: rgba(201, 168, 76, 0.35) !important;
+    }
+
+    .bitem:hover {
+      transform: translateY(-2.5px);
+      box-shadow: 0 8px 24px rgba(240, 96, 96, 0.12);
+      border-color: rgba(240, 96, 96, 0.35) !important;
+    }
+
+    .lni:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 0 6px 18px rgba(74, 158, 255, 0.08);
+      border-color: rgba(74, 158, 255, 0.3) !important;
+    }
+
+    /* Smooth Slide-up Fade-in for Chat Bubbles */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .cbbl {
+      animation: fadeInUp 0.38s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+    }
+
+    /* Soft Page-Tab Transition for Output Sections */
+    .osec {
+      transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .osec.hidden {
+      opacity: 0;
+      transform: translateY(8px);
+      display: none !important;
+    }
+
+    .osec.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 
@@ -2042,8 +2147,8 @@
           <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
           <span class="ed-lang" id="edLang">python</span>
           <button id="docGenBtn" onclick="runCommentGen()"
-            style="background:var(--purp2); border:1px solid rgba(167,139,250,.25); color:var(--purp); font-family:var(--fui); font-size:0.58rem; font-weight:700; letter-spacing:0.04em; padding:2px 8px; border-radius:4px; cursor:pointer; margin-right:8px; transition:all 0.2s;"
-            title="Generate comments and docstrings for this code">✍ Comment Code</button>
+            style="background:var(--purp2); border:1px solid rgba(167,139,250,.25); color:var(--purp); font-family:var(--fui); font-size:0.62rem; font-weight:700; letter-spacing:0.04em; padding:4px 10px; border-radius:4px; cursor:pointer; margin-right:4px; transition:all 0.2s;"
+            title="Generate comments and docstrings for this code">Comment Code</button>
           <button class="ed-clr" onclick="clearEd()">✕</button>
         </div>
         <div class="ed-body">
@@ -2121,18 +2226,54 @@
       <div class="results hidden" id="results">
         <div class="otabs">
           <button class="otab active" data-tab="explain" onclick="stab(this,'explain')">Explain</button>
-          <button class="otab" data-tab="bugs" onclick="stab(this,'bugs')">Bugs <span class="bbdg hidden"
-              id="bbdg">0</span></button>
           <button class="otab hidden" data-tab="fixed" onclick="stab(this,'fixed')" id="fixTab">Fixed</button>
           <button class="otab" data-tab="dryrun" onclick="stab(this,'dryrun')">Dry Run</button>
-          <button class="otab" data-tab="cx" onclick="stab(this,'cx')">Complexity</button>
-          <button class="otab" data-tab="suggest" onclick="stab(this,'suggest')">Suggest</button>
           <button class="otab" data-tab="refactor" onclick="stab(this,'refactor')">Refactor</button>
+          <button class="otab" data-tab="dsa" onclick="stab(this,'dsa')">DSA Mode</button>
+          <button class="otab" data-tab="interview" onclick="stab(this,'interview')">Interview Prep</button>
+          <button class="otab" data-tab="lab" onclick="stab(this,'lab')">Lab Assistant</button>
         </div>
 
         <div class="osec active" id="sec-explain">
-          <div class="slbl"><span class="sd gold"></span>Line-by-Line Breakdown</div>
-          <div class="exlist" id="exlist"></div>
+          <!-- Complexity Metrics Dashboard -->
+          <div class="cxgrid" style="margin-bottom: 16px;">
+            <div class="cxcard">
+              <div class="cxhead">
+                <div class="cxic tic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                  </svg></div>
+                <span class="cxtype">Time</span>
+              </div>
+              <div class="cxbadge" id="timeBdg">O(?)</div>
+              <p class="cxdet" id="timeDet"></p>
+            </div>
+            <div class="cxcard">
+              <div class="cxhead">
+                <div class="cxic sic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M9 3V21M15 3V21M3 9H21M3 15H21" stroke="currentColor" stroke-width=".8" opacity=".5" />
+                  </svg></div>
+                <span class="cxtype">Space</span>
+              </div>
+              <div class="cxbadge teal" id="spaceBdg">O(?)</div>
+              <p class="cxdet" id="spaceDet"></p>
+            </div>
+          </div>
+
+          <!-- Bug Notification Banner -->
+          <div id="explain-bug-alert" class="hidden" style="background:rgba(240,96,96,0.06); border:1px solid rgba(240,96,96,0.22); border-radius:var(--r2); padding:12px; margin-bottom:16px; color:var(--red); font-size:0.72rem; line-height:1.45;">
+            <strong style="display:flex; align-items:center; gap:6px;">⚠️ Bugs / Vulnerabilities Detected (<span id="explain-bug-count">0</span>)</strong>
+            <div id="explain-bug-list" style="margin-top:6px; display:flex; flex-direction:column; gap:4px; font-family:var(--fb);"></div>
+          </div>
+
+          <!-- Line by Line -->
+          <div class="slbl" style="margin-top: 0;"><span class="sd gold"></span>Line-by-Line Breakdown</div>
+          <div class="exlist" id="exlist" style="margin-bottom: 16px;"></div>
+
+          <!-- Suggestions -->
+          <div class="slbl"><span class="sd teal"></span>Optimization Suggestions</div>
+          <div class="slist" id="slist"></div>
         </div>
         <div class="osec hidden" id="sec-bugs">
           <div class="slbl"><span class="sd red"></span>Bug &amp; Error Detection</div>
@@ -2160,6 +2301,10 @@
               <button class="drbtn drplay" id="drPlay" onclick="drToggle()">▶ Play</button>
             </div>
             <div class="drview" id="drview"></div>
+            <!-- Dynamic Visualization Canvas -->
+            <div id="dr-visualization-panel" style="margin-top: 12px; min-height: 180px; background: var(--bgi); border: 1px solid var(--b1); border-radius: var(--r2); padding: 16px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: auto; transition: all 0.3s ease;">
+              <div id="ds-visuals-container" style="width: 100%; display: flex; justify-content: center; align-items: center;"></div>
+            </div>
             <div class="drres hidden" id="drres"></div>
           </div>
           <div id="dr-flowchart-wrap" class="hidden">
@@ -2170,36 +2315,7 @@
             </div>
           </div>
         </div>
-        <div class="osec hidden" id="sec-cx">
-          <div class="cxgrid">
-            <div class="cxcard">
-              <div class="cxhead">
-                <div class="cxic tic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
-                    <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                  </svg></div>
-                <span class="cxtype">Time</span>
-              </div>
-              <div class="cxbadge" id="timeBdg">O(?)</div>
-              <p class="cxdet" id="timeDet"></p>
-            </div>
-            <div class="cxcard">
-              <div class="cxhead">
-                <div class="cxic sic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5" />
-                    <path d="M9 3V21M15 3V21M3 9H21M3 15H21" stroke="currentColor" stroke-width=".8" opacity=".5" />
-                  </svg></div>
-                <span class="cxtype">Space</span>
-              </div>
-              <div class="cxbadge teal" id="spaceBdg">O(?)</div>
-              <p class="cxdet" id="spaceDet"></p>
-            </div>
-          </div>
-        </div>
-        <div class="osec hidden" id="sec-suggest">
-          <div class="slbl"><span class="sd teal"></span>Optimization Suggestions</div>
-          <div class="slist" id="slist"></div>
-        </div>
+        <!-- Combined sections deleted (rendered inline inside Explain) -->
 
         <div class="osec hidden" id="sec-refactor">
           <div class="slbl"><span class="sd purp"></span>Complexity Converter</div>
@@ -2236,6 +2352,47 @@
               style="font-size:0.75rem; color:var(--tx2); line-height:1.65; background:var(--bg3); padding:12px; border-radius:var(--r2); border:1px solid var(--b1); margin-top:6px;">
             </p>
           </div>
+        </div>
+
+        <!-- New DSA Mode Section -->
+        <div class="osec hidden" id="sec-dsa">
+          <div class="slbl"><span class="sd gold"></span>DSA Pattern & Concept</div>
+          <div id="dsa-pattern-desc" style="font-size:0.75rem; color:var(--tx2); line-height:1.65; background:var(--bg3); padding:12px; border-radius:var(--r2); border:1px solid var(--b1); margin-bottom:12px;"></div>
+          
+          <div class="slbl"><span class="sd blue"></span>LeetCode Practice Problems</div>
+          <div id="dsa-leetcode-list" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;"></div>
+          
+          <div class="slbl"><span class="sd teal"></span>Concept Practice Exercises</div>
+          <div id="dsa-exercises-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <!-- New Interview Prep Section -->
+        <div class="osec hidden" id="sec-interview">
+          <div class="slbl"><span class="sd gold"></span>Interviewer Questions</div>
+          <div id="interview-questions-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
+          
+          <div class="slbl"><span class="sd blue"></span>Mock Interview Mode</div>
+          <div style="background:var(--bg3); border:1px solid var(--b1); border-radius:var(--r2); padding:12px; display:flex; flex-direction:column; gap:10px;">
+            <p style="font-size:0.72rem; color:var(--tx2); line-height:1.5;">
+              Simulate a live technical coding interview with Codeyy AI based on your submitted code.
+            </p>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button class="drbtn drplay" id="startInterviewBtn" onclick="toggleMockInterview()" style="font-weight:700; padding:6px 14px;">Start Mock Interview</button>
+              <span id="interviewStatusPill" class="ctx-pill hidden" style="background:var(--purp2); border-color:rgba(167, 139, 250, 0.2); color:var(--purp);">Interview Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Lab Assistant Section -->
+        <div class="osec hidden" id="sec-lab">
+          <div class="slbl"><span class="sd gold"></span>Program Algorithm</div>
+          <div id="lab-algorithm-desc" style="font-family:var(--fb); font-size:0.75rem; color:var(--tx2); line-height:1.65; background:var(--bg3); padding:12px; border-radius:var(--r2); border:1px solid var(--b1); margin-bottom:12px; white-space:pre-line;"></div>
+          
+          <div class="slbl"><span class="sd blue"></span>Lab Viva Voce Questions</div>
+          <div id="lab-viva-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
+          
+          <div class="slbl"><span class="sd teal"></span>Lab Report Export</div>
+          <button class="abtn" onclick="downloadPDFReport()" style="background:linear-gradient(135deg, #3ecfb2, #2bb79b); color:#070e1c; box-shadow:0 4px 18px rgba(62,207,178,0.2); max-width:240px; height:40px;">Download PDF Report</button>
         </div>
 
         <div class="qa-wrap">
@@ -2335,8 +2492,11 @@
       const langSel = document.getElementById('langSel');
       if (langSel) {
         langSel.value = storedLang;
-        curLang = storedLang;
-        document.getElementById('edLang').textContent = storedLang === 'auto' ? 'auto' : langSel.options[langSel.selectedIndex].text;
+        if (langSel.selectedIndex === -1) {
+          langSel.value = 'auto';
+        }
+        curLang = langSel.value;
+        document.getElementById('edLang').textContent = curLang === 'auto' ? 'auto' : langSel.options[langSel.selectedIndex].text;
       }
 
       updateLn();
@@ -2345,7 +2505,7 @@
         langSel.addEventListener('change', e => {
           curLang = e.target.value;
           localStorage.setItem('codeyy_last_lang', curLang);
-          document.getElementById('edLang').textContent = curLang === 'auto' ? 'auto' : e.target.options[e.target.selectedIndex].text;
+          document.getElementById('edLang').textContent = (curLang === 'auto' || e.target.selectedIndex === -1) ? 'auto' : e.target.options[e.target.selectedIndex].text;
         });
       }
 
@@ -2435,10 +2595,109 @@
       document.getElementById('imgWrap').classList.toggle('hidden', m !== 'image');
     }
 
-    function onTA() { updateLn(); }
+    function onTA() {
+      updateLn();
+      triggerAutoDetect();
+    }
+    
+    function localDetectLanguage(code) {
+      const lines = code.split('\n');
+      const firstLine = lines[0] ? lines[0].trim() : '';
+      const secondLine = lines[1] ? lines[1].trim() : '';
+      const checkText = (firstLine + ' ' + secondLine).trim();
+      if (!checkText) return null;
+
+      // C++ / C
+      if (checkText.startsWith('#include') || checkText.startsWith('using namespace') || checkText.includes('std::') || checkText.includes('vector<') || checkText.includes('class Solution')) {
+        return 'cpp';
+      }
+      // Java
+      if (checkText.startsWith('import java.') || checkText.includes('public class ') || checkText.startsWith('package ') || checkText.includes('class Main') || checkText.includes('public static void main')) {
+        return 'java';
+      }
+      // Python
+      if (checkText.startsWith('import ') || checkText.startsWith('from ') || checkText.startsWith('def ') || checkText.startsWith('#!') || (checkText.includes('print(') && !checkText.includes(';'))) {
+        return 'python';
+      }
+      // JavaScript / TypeScript
+      if (checkText.startsWith('import React') || checkText.startsWith('import {') || checkText.includes('const ') || checkText.includes('let ') || checkText.startsWith('function ') || checkText.includes('console.log')) {
+        return 'javascript';
+      }
+      // HTML
+      if (checkText.toLowerCase().startsWith('<!doctype html') || checkText.toLowerCase().startsWith('<html') || checkText.toLowerCase().startsWith('<div')) {
+        return 'html';
+      }
+      // C#
+      if (checkText.startsWith('using System') || checkText.includes('namespace ') || checkText.includes('static void Main')) {
+        return 'csharp';
+      }
+      return null;
+    }
+
+    let detectTimeout = null;
+    let lastLength = 0;
+    function triggerAutoDetect() {
+      const code = g('codeTA').value.trim();
+      lastLength = code.length;
+      if (code.length < 5) return;
+
+      // 1. Local instant detection rule (highly responsive, no API overhead)
+      const localLang = localDetectLanguage(code);
+      if (localLang) {
+        const matched = matchLang(localLang);
+        if (matched && matched !== curLang) {
+          g('langSel').value = matched;
+          if (g('langSel').selectedIndex === -1) {
+            g('langSel').value = 'auto';
+          }
+          curLang = g('langSel').value;
+          localStorage.setItem('codeyy_last_lang', curLang);
+          g('edLang').textContent = curLang === 'auto' ? 'auto' : g('langSel').options[g('langSel').selectedIndex].text;
+          showToast('Auto-Detected: ' + (curLang === 'auto' ? 'auto' : g('langSel').options[g('langSel').selectedIndex].text));
+          clearTimeout(detectTimeout);
+          return;
+        }
+      }
+
+      // 2. Debounced Gemini API detection fallback
+      clearTimeout(detectTimeout);
+      detectTimeout = setTimeout(async () => {
+        const currentCode = g('codeTA').value.trim();
+        if (currentCode.length < 15) return;
+        try {
+          const res = await fetch(`${API}/detect`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'X-Gemini-API-Key': localStorage.getItem('gemini_api_key') || ''
+            },
+            body: JSON.stringify({ code: currentCode })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.language) {
+              const matched = matchLang(data.language);
+              if (matched && matched !== curLang) {
+                g('langSel').value = matched;
+                if (g('langSel').selectedIndex === -1) {
+                  g('langSel').value = 'auto';
+                }
+                curLang = g('langSel').value;
+                localStorage.setItem('codeyy_last_lang', curLang);
+                g('edLang').textContent = curLang === 'auto' ? 'auto' : g('langSel').options[g('langSel').selectedIndex].text;
+                showToast('Auto-Detected: ' + (curLang === 'auto' ? 'auto' : g('langSel').options[g('langSel').selectedIndex].text));
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Auto-detect failed:", e);
+        }
+      }, 1200);
+    }
     function updateLn() {
       const ta = g('codeTA'), ln = g('lnums');
-      ln.textContent = Array.from({ length: ta.value.split('\n').length }, (_, i) => i + 1).join('\n');
+      const lines = ta.value.split('\n').length;
+      ln.innerHTML = Array.from({ length: lines }, (_, i) => `<div class="ln-num-item" id="ln-item-${i+1}">${i + 1}</div>`).join('');
     }
     function syncLn() { g('lnums').scrollTop = g('codeTA').scrollTop; }
     function clearEd() { g('codeTA').value = ''; updateLn(); }
@@ -2509,7 +2768,7 @@
       }
       const btn = g('docGenBtn');
       const oldText = btn.textContent;
-      btn.textContent = '✍ Documenting…';
+      btn.textContent = 'Documenting…';
       btn.disabled = true;
       hideErr();
       try {
@@ -2517,7 +2776,7 @@
         if (data.commented_code) {
           g('codeTA').value = data.commented_code;
           updateLn();
-          showToast('✓ Comments and docstrings generated successfully!');
+          showToast('Comments and docstrings generated successfully!');
         } else {
           showToast('Could not add comments. Code remains unchanged.');
         }
@@ -2631,6 +2890,11 @@
     function renderAll(d) {
       renderExplain(d.line_explanations || ''); renderBugs(d.bug_detection || ''); renderFixed(d.corrected_code || '');
       renderDryRun(d.dry_run || '', d.flowchart || ''); renderCx(d.time_complexity || '', d.space_complexity || ''); renderSugg(d.suggestions || '');
+      
+      // Render New Visual Learning Modes
+      renderDSAMode(d.dsa_pattern || '', d.leetcode_problems || '', d.practice_exercises || '');
+      renderInterviewPrep(d.interview_questions || '');
+      renderLabAssistant(d.algorithm || '', d.viva_questions || '');
     }
 
     function renderExplain(raw) {
@@ -2645,22 +2909,30 @@
         else if (cur && cur.expl && ln.trim()) cur.expl += ' ' + ln.trim();
       }
       if (cur) items.push(cur);
-      if (!items.length) { el.innerHTML = `<div class="lni"><p class="lexpl">${e(raw)}</p></div>`; return; }
+      if (!items.length) { el.innerHTML = `<div class="lni"><div class="lexpl">${typeof marked !== 'undefined' ? marked.parse(raw) : e(raw)}</div></div>`; return; }
       items.forEach((it, i) => {
         const d = ce('div'); d.className = 'lni'; d.style.animationDelay = `${i * .025}s`;
-        d.innerHTML = `<div class="lntop"><span class="lnum">${it.n}</span><code class="lcode">${e(it.code)}</code></div><p class="lexpl">${e(it.expl)}</p>`;
+        const explText = typeof marked !== 'undefined' ? marked.parse(it.expl) : e(it.expl);
+        d.innerHTML = `<div class="lntop"><span class="lnum">${it.n}</span><code class="lcode">${e(it.code)}</code></div><div class="lexpl">${explText}</div>`;
         el.appendChild(d);
       });
     }
 
     function renderBugs(raw) {
       const el = g('buglist'), bdg = g('bbdg'); el.innerHTML = '';
+      const alertBox = g('explain-bug-alert');
+      const alertList = g('explain-bug-list');
+      const alertCount = g('explain-bug-count');
+
       if (!raw || /BUG_NONE/i.test(raw) || /no bugs detected/i.test(raw)) {
-        bdg.classList.add('hidden');
+        if (bdg) bdg.classList.add('hidden');
         el.innerHTML = `<div class="bitem clean"><div class="btop"><span class="bsev ss">✓ Clean</span></div><p class="btxt">No bugs or errors detected.</p></div>`;
+        if (alertBox) alertBox.classList.add('hidden');
         return;
       }
       const blocks = raw.split(/BUG_\d+:/g).filter(b => b.trim()); let cnt = 0;
+      if (alertList) alertList.innerHTML = '';
+
       blocks.forEach((blk, idx) => {
         const sm = blk.match(/Line\s*(\S+)\s*[—\-–]\s*(ERROR|WARNING|SUGGESTION)/i);
         const cm = blk.match(/Code:\s*(.+)/i);
@@ -2672,11 +2944,31 @@
         const sc = sev === 'ERROR' ? 'se' : sev === 'WARNING' ? 'sw' : 'ss';
         cnt++;
         const d = ce('div'); d.className = `bitem ${ic}`; d.style.animationDelay = `${idx * .05}s`;
-        d.innerHTML = `<div class="btop"><span class="bsev ${sc}">${sev}</span><span class="bln">Line ${sm ? sm[1] : '?'}</span></div>${cm ? `<div class="bcode">${e(cm[1].trim())}</div>` : ''}<div class="brow"><span class="blbl">Issue</span><span class="btxt">${e(im ? im[1].trim() : '')}</span></div>${fm ? `<div class="brow"><span class="blbl">Fix</span><div class="bfix">${e(fm[1].trim())}</div></div>` : ''}`;
+        const issueText = typeof marked !== 'undefined' ? marked.parse(im ? im[1].trim() : '') : e(im ? im[1].trim() : '');
+        d.innerHTML = `<div class="btop"><span class="bsev ${sc}">${sev}</span><span class="bln">Line ${sm ? sm[1] : '?'}</span></div>${cm ? `<div class="bcode">${e(cm[1].trim())}</div>` : ''}<div class="brow"><span class="blbl">Issue</span><div class="btxt">${issueText}</div></div>${fm ? `<div class="brow"><span class="blbl">Fix</span><div class="bfix">${e(fm[1].trim())}</div></div>` : ''}`;
         el.appendChild(d);
+
+        if (alertList) {
+          const li = ce('div');
+          li.style = 'border-bottom:1px dashed rgba(240,96,96,0.15); padding: 4px 0; display: flex; gap: 8px; justify-content: flex-start; text-align: left;';
+          li.innerHTML = `
+            <span style="font-weight:700; color:var(--red); text-transform:uppercase; flex-shrink:0;">[Line ${sm ? sm[1] : '?'}]</span> 
+            <span style="color:var(--tx2);">${e(im ? im[1].replace(/\n/g, ' ').trim() : '')}</span>
+          `;
+          alertList.appendChild(li);
+        }
       });
-      if (cnt === 0) { bdg.classList.add('hidden'); el.innerHTML = `<div class="bitem clean"><p class="btxt">${e(raw)}</p></div>`; }
-      else { bdg.textContent = String(cnt); bdg.classList.remove('hidden'); }
+      if (cnt === 0) { 
+        if (bdg) bdg.classList.add('hidden'); 
+        el.innerHTML = `<div class="bitem clean"><p class="btxt">${e(raw)}</p></div>`; 
+        if (alertBox) alertBox.classList.add('hidden');
+      } else { 
+        if (bdg) { bdg.textContent = String(cnt); bdg.classList.remove('hidden'); }
+        if (alertBox) {
+          alertBox.classList.remove('hidden');
+          if (alertCount) alertCount.textContent = String(cnt);
+        }
+      }
     }
 
     function renderFixed(raw) {
@@ -2689,24 +2981,58 @@
 
     function renderDryRun(raw, flowchartRaw) {
       drSteps = []; drIdx = 0;
-
-      // Set default view to trace (Steps)
       setDrMode('trace');
 
-      const rm = raw.match(/RESULT:\s*(.+)/i);
       const re = g('drres');
-      if (rm) { re.textContent = '↳ Result: ' + rm[1].trim(); re.classList.remove('hidden'); } else re.classList.add('hidden');
-      raw.split(/STEP_\d+:/g).filter(b => b.trim()).forEach(blk => {
-        const lm = blk.match(/Line:\s*(.+)/i);
-        const am = blk.match(/Action:\s*([\s\S]+?)(?=Variables:|RESULT:|$)/i);
-        const vm = blk.match(/Variables:\s*(.+)/i);
-        if (!am) return;
-        drSteps.push({ line: lm ? lm[1].trim() : '—', action: am[1].trim().replace(/\n/g, ' '), vars: vm ? vm[1].trim() : '' });
-      });
-      if (!drSteps.length) { g('drview').innerHTML = `<p style="color:var(--tx3);font-size:.76rem;line-height:1.7">${e(raw)}</p>`; g('drCnt').textContent = ''; }
-      else { drRender(0); }
+      re.classList.add('hidden');
 
-      // Save flowchart data and render it
+      let parsedJson = null;
+      let cleanRaw = raw.trim();
+      
+      if (cleanRaw.startsWith('```')) {
+        cleanRaw = cleanRaw.replace(/^```[a-zA-Z]*\n/, '').replace(/\n```$/, '');
+      }
+
+      try {
+        parsedJson = JSON.parse(cleanRaw);
+      } catch (err) {
+        parsedJson = null;
+      }
+
+      if (Array.isArray(parsedJson)) {
+        drSteps = parsedJson;
+        const lastStep = drSteps[drSteps.length - 1];
+        if (lastStep && lastStep.action && (lastStep.action.toLowerCase().includes("result") || lastStep.action.toLowerCase().includes("return"))) {
+          re.textContent = '↳ Result: ' + lastStep.action;
+          re.classList.remove('hidden');
+        }
+      } else {
+        const rm = raw.match(/RESULT:\s*(.+)/i);
+        if (rm) { re.textContent = '↳ Result: ' + rm[1].trim(); re.classList.remove('hidden'); }
+        raw.split(/STEP_\d+:/g).filter(b => b.trim()).forEach(blk => {
+          const lm = blk.match(/Line:\s*(.+)/i);
+          const am = blk.match(/Action:\s*([\s\S]+?)(?=Variables:|RESULT:|$)/i);
+          const vm = blk.match(/Variables:\s*(.+)/i);
+          if (!am) return;
+          drSteps.push({
+            line: lm ? lm[1].trim() : '—',
+            action: am[1].trim().replace(/\n/g, ' '),
+            vars: vm ? vm[1].trim() : '',
+            ds_type: 'none',
+            ds_data: null
+          });
+        });
+      }
+
+      if (!drSteps.length) { 
+        g('drview').innerHTML = `<p style="color:var(--tx3);font-size:.76rem;line-height:1.7">${e(raw)}</p>`; 
+        g('drCnt').textContent = ''; 
+        g('ds-visuals-container').innerHTML = '';
+        g('dr-visualization-panel').style.display = 'none';
+      } else { 
+        drRender(0); 
+      }
+
       currentFlowchartGraph = flowchartRaw || '';
       renderMermaidFlowchart();
     }
@@ -2754,13 +3080,156 @@
         if (badge) badge.remove();
       }
     }
+
     function drRender(i) {
       const s = drSteps[i]; if (!s) return;
-      const pills = s.vars ? s.vars.split(',').map(v => `<span class="drvar">${e(v.trim())}</span>`).join('') : `<span style="color:var(--tx3);font-size:.7rem">No variables yet</span>`;
+      
+      let pills = '';
+      if (typeof s.variables === 'object' && s.variables !== null) {
+        pills = Object.entries(s.variables).map(([k, v]) => {
+          let stringVal = typeof v === 'object' ? JSON.stringify(v) : String(v);
+          return `<span class="drvar"><b>${e(k)}</b>: ${e(stringVal)}</span>`;
+        }).join('');
+      } else if (s.vars) {
+        pills = s.vars.split(',').map(v => `<span class="drvar">${e(v.trim())}</span>`).join('');
+      } else {
+        pills = `<span style="color:var(--tx3);font-size:.7rem">No variables yet</span>`;
+      }
+      
       g('drview').innerHTML = `<div class="drsn">Step ${i + 1} of ${drSteps.length}</div><div class="drlr">Line ${e(s.line)}</div><p class="dract">${e(s.action)}</p><div class="drvlbl">Variable State</div><div class="drvars">${pills}</div>`;
       g('drCnt').textContent = `Step ${i + 1} of ${drSteps.length}`;
       g('drPrev').disabled = (i === 0); g('drNext').disabled = (i === drSteps.length - 1);
+      
+      // Highlight active line number
+      document.querySelectorAll('.ln-num-item.active').forEach(el => el.classList.remove('active'));
+      const activeLineNum = parseInt(s.line);
+      if (!isNaN(activeLineNum)) {
+        const lineItem = g(`ln-item-${activeLineNum}`);
+        if (lineItem) {
+          lineItem.classList.add('active');
+          lineItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }
+
+      renderVisualizationPanel(s.ds_type || 'none', s.ds_data || null);
     }
+
+    function renderVisualizationPanel(type, data) {
+      const container = g('ds-visuals-container');
+      const panel = g('dr-visualization-panel');
+      if (!type || type === 'none' || !data || (Array.isArray(data) && data.length === 0)) {
+        panel.style.display = 'none';
+        container.innerHTML = '';
+        return;
+      }
+      
+      panel.style.display = 'flex';
+      const cleanType = type.toLowerCase().trim();
+      
+      if (cleanType === 'array' || cleanType === 'stack' || cleanType === 'queue') {
+        let html = `<div style="display:flex; gap:10px; flex-direction:${cleanType === 'stack' ? 'column-reverse' : 'row'}; align-items:center; justify-content:center; animation: fin 0.3s ease;">`;
+        if (Array.isArray(data)) {
+          data.forEach((val, idx) => {
+            let label = idx;
+            if (cleanType === 'stack' && idx === data.length - 1) label = 'Top';
+            if (cleanType === 'queue') {
+              if (idx === 0) label = 'Front';
+              else if (idx === data.length - 1) label = 'Back';
+            }
+            html += `
+              <div style="background:var(--bg3); border: 2px solid ${cleanType === 'stack' ? 'var(--gold)' : cleanType === 'queue' ? 'var(--blue)' : 'var(--teal)'}; color:var(--tx1); font-family:var(--fm); font-size:0.85rem; font-weight:600; min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; border-radius:var(--r1); box-shadow: 0 4px 10px rgba(0,0,0,0.25); transition: all 0.3s; position:relative; padding: 4px 8px;">
+                ${e(typeof val === 'object' ? JSON.stringify(val) : val)}
+                <span style="position:absolute; ${cleanType === 'stack' ? 'right:-38px' : 'bottom:-16px'}; font-size:0.55rem; color:var(--tx3); font-family:var(--fui); font-weight:600; text-transform:uppercase;">${label}</span>
+              </div>
+            `;
+          });
+        }
+        html += '</div>';
+        container.innerHTML = html;
+      } 
+      else if (cleanType === 'linkedlist') {
+        let html = `<div style="display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; animation: fin 0.3s ease;">`;
+        if (Array.isArray(data)) {
+          data.forEach((val, idx) => {
+            html += `
+              <div style="display:flex; align-items:center; background:var(--bg3); border:1.5px solid var(--teal); border-radius:var(--r1); padding:8px 12px; font-family:var(--fm); font-size:0.75rem; color:var(--tx1); box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                <span style="font-weight:600;">${e(typeof val === 'object' ? JSON.stringify(val) : val)}</span>
+              </div>
+            `;
+            if (idx < data.length - 1) {
+              html += `<span style="color:var(--teal); font-weight:bold; font-size:1.1rem; user-select:none; animation: blink 2s infinite;">➔</span>`;
+            }
+          });
+        }
+        html += '</div>';
+        container.innerHTML = html;
+      }
+      else if (cleanType === 'recursion') {
+        let html = `<div style="display:flex; flex-direction:column-reverse; gap:6px; align-items:center; justify-content:center; width:100%; max-width:260px; animation: fin 0.3s ease;">`;
+        if (Array.isArray(data)) {
+          data.forEach((frame, idx) => {
+            const isTop = (idx === data.length - 1);
+            html += `
+              <div style="width:100%; text-align:center; padding:8px; background:${isTop ? 'var(--purp2)' : 'var(--bg3)'}; border:1.5px solid ${isTop ? 'var(--purp)' : 'var(--tx3)'}; border-radius:var(--r1); font-family:var(--fm); font-size:0.72rem; color:${isTop ? 'var(--tx1)' : 'var(--tx2)'}; transition:all 0.3s; position:relative; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                ${e(frame)}
+                ${isTop ? '<span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-family:var(--fui); font-size:0.48rem; color:var(--purp); text-transform:uppercase; font-weight:700; border:1px solid var(--purp); padding:1px 4px; border-radius:3px;">Active</span>' : ''}
+              </div>
+            `;
+          });
+        }
+        html += '</div>';
+        container.innerHTML = html;
+      }
+      else if (cleanType === 'tree' || cleanType === 'graph') {
+        container.innerHTML = `<div class="thinking" style="border:none; background:transparent; margin: 10px auto;"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+        renderTreeGraphMermaid(data);
+      }
+      else {
+        panel.style.display = 'none';
+        container.innerHTML = '';
+      }
+    }
+
+    async function renderTreeGraphMermaid(data) {
+      const container = g('ds-visuals-container');
+      if (!data) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      let graphString = 'graph TD\n';
+      graphString += 'classDef default fill:#122858,stroke:#3ecfb2,stroke-width:1.5px,color:#f3f5ed;\n';
+      
+      if (Array.isArray(data)) {
+        data.forEach((edge, idx) => {
+          if (Array.isArray(edge) && edge.length >= 2) {
+            graphString += `  ${edge[0]} --> ${edge[1]}\n`;
+          } else {
+            graphString += `  Node${idx}[${e(edge)}]\n`;
+          }
+        });
+      } else if (typeof data === 'object') {
+        Object.entries(data).forEach(([parent, children]) => {
+          if (Array.isArray(children)) {
+            children.forEach(child => {
+              graphString += `  ${parent} --> ${child}\n`;
+            });
+          } else {
+            graphString += `  ${parent} --> ${children}\n`;
+          }
+        });
+      }
+      
+      try {
+        const uniqueId = 'ds-mermaid-' + Date.now();
+        const { svg } = await mermaid.render(uniqueId, graphString);
+        container.innerHTML = svg;
+      } catch (err) {
+        console.error("Dynamic DS Graph Render error:", err);
+        container.innerHTML = '<span style="color:var(--red); font-size:0.7rem;">Graph parsing error</span>';
+      }
+    }
+
     function drGo(d) { drIdx = Math.max(0, Math.min(drSteps.length - 1, drIdx + d)); drRender(drIdx); }
     function drToggle() {
       const b = g('drPlay');
@@ -2780,10 +3249,11 @@
       const el = g('slist'); el.innerHTML = '';
       const lines = raw.split('\n').filter(l => l.trim()); const items = [];
       for (const l of lines) { const m = l.match(/^\d+\.\s+(.+)/); if (m) items.push(m[1].trim()); else if (items.length && l.trim()) items[items.length - 1] += ' ' + l.trim(); }
-      if (!items.length) { el.innerHTML = `<div class="sitem"><span class="stxt">${e(raw)}</span></div>`; return; }
+      if (!items.length) { el.innerHTML = `<div class="sitem"><div class="stxt">${typeof marked !== 'undefined' ? marked.parse(raw) : e(raw)}</div></div>`; return; }
       items.forEach((t, i) => {
         const d = ce('div'); d.className = 'sitem'; d.style.animationDelay = `${i * .06}s`;
-        d.innerHTML = `<span class="snum">${String(i + 1).padStart(2, '0')}</span><span class="stxt">${e(t)}</span>`;
+        const suggText = typeof marked !== 'undefined' ? marked.parse(t) : e(t);
+        d.innerHTML = `<span class="snum">${String(i + 1).padStart(2, '0')}</span><div class="stxt">${suggText}</div>`;
         el.appendChild(d);
       });
     }
@@ -2802,18 +3272,288 @@
       addBbl('q', q); ta.value = ''; autoH(ta);
       const th = addThink(); g('sbtn').disabled = true;
       try {
-        const data = await post('/ask', { question: q, code: curCode, language: curLang, conversation_history: chatH });
+        const data = await post('/ask', { 
+          question: q, 
+          code: curCode, 
+          language: curLang, 
+          conversation_history: chatH,
+          interview_mode: mockInterviewActive 
+        });
         th.remove(); addBbl('a', data.answer);
         chatH.push({ question: q, answer: data.answer });
         if (chatH.length > 10) chatH = chatH.slice(-10);
       } catch (err) { th.remove(); addBbl('a', '⚠ ' + err.message); }
       finally { g('sbtn').disabled = false; }
     }
+
+    function renderDSAMode(pattern, leetcode, exercises) {
+      g('dsa-pattern-desc').innerHTML = pattern ? (typeof marked !== 'undefined' ? marked.parse(pattern) : e(pattern)) : 'No patterns detected.';
+      
+      const lcContainer = g('dsa-leetcode-list');
+      lcContainer.innerHTML = '';
+      if (leetcode) {
+        leetcode.split('\n').filter(l => l.trim()).forEach(line => {
+          const parts = line.split('|');
+          const title = parts[0] ? parts[0].replace(/^\d+\.\s+/, '').trim() : 'LeetCode Problem';
+          const link = parts[1] ? parts[1].trim() : 'https://leetcode.com';
+          const card = ce('div');
+          card.style = 'background:var(--bg3); border:1px solid var(--b1); border-radius:var(--r1); padding:8px 12px; display:flex; align-items:center; justify-content:space-between; margin-bottom: 4px;';
+          card.innerHTML = `
+            <span style="font-family:var(--fb); font-size:0.75rem; color:var(--tx2); flex:1; text-align:left;">${e(title)}</span>
+            <a href="${e(link)}" target="_blank" style="font-family:var(--fui); font-size:0.62rem; font-weight:700; color:var(--gold); text-decoration:none; text-transform:uppercase; border:1px solid rgba(201,168,76,0.3); padding:3px 8px; border-radius:4px; transition:all 0.2s;">Practice ↗</a>
+          `;
+          lcContainer.appendChild(card);
+        });
+      } else {
+        lcContainer.innerHTML = '<span style="color:var(--tx3); font-size:0.7rem;">No recommendations generated.</span>';
+      }
+
+      g('dsa-exercises-list').innerHTML = exercises ? (typeof marked !== 'undefined' ? marked.parse(exercises) : e(exercises)) : 'No practice exercises available.';
+    }
+
+    function renderInterviewPrep(questions) {
+      const el = g('interview-questions-list');
+      el.innerHTML = '';
+      if (questions) {
+        const parsed = typeof marked !== 'undefined' ? marked.parse(questions) : e(questions);
+        el.innerHTML = `<div style="font-size:0.75rem; color:var(--tx2); line-height:1.65; background:var(--bg3); padding:12px; border-radius:var(--r2); border:1px solid var(--b1);">${parsed}</div>`;
+      } else {
+        el.innerHTML = '<span style="color:var(--tx3); font-size:0.7rem;">No questions available.</span>';
+      }
+    }
+
+    function renderLabAssistant(algorithm, viva) {
+      g('lab-algorithm-desc').innerHTML = algorithm ? (typeof marked !== 'undefined' ? marked.parse(algorithm) : e(algorithm)) : 'No algorithm steps available.';
+      
+      const el = g('lab-viva-list');
+      el.innerHTML = '';
+      if (viva) {
+        const blocks = viva.split(/(?=Q:\s*|Question:\s*|^\d+\.\s*Q:)/im).filter(b => b.trim());
+        if (blocks.length > 0) {
+          blocks.forEach((blk, idx) => {
+            const lines = blk.split('\n');
+            const qLine = lines.find(l => l.match(/^(Q|Question|\d+\.\s*Q):/i)) || 'Question ' + (idx + 1);
+            const qText = qLine.replace(/^(Q|Question|\d+\.\s*Q):\s*/i, '').trim();
+            const aText = lines.filter(l => !l.match(/^(Q|Question|\d+\.\s*Q):/i)).join('\n').replace(/^A:\s*/i, '').trim();
+            
+            const card = ce('div');
+            card.style = 'background:var(--bg3); border:1px solid var(--b1); border-radius:var(--r2); padding:10px 12px; display:flex; flex-direction:column; gap:6px; margin-bottom: 6px;';
+            card.innerHTML = `
+              <span style="font-family:var(--fui); font-size:0.72rem; font-weight:700; color:var(--gold); text-align:left;">Q${idx+1}: ${e(qText)}</span>
+              <button onclick="toggleVivaAnswer(this)" style="background:var(--blue2); border:1px solid rgba(74,158,255,0.2); color:var(--blue); font-family:var(--fui); font-size:0.58rem; font-weight:700; width:fit-content; padding:2px 8px; border-radius:4px; cursor:pointer;">Reveal Answer</button>
+              <div class="viva-ans hidden" style="font-family:var(--fb); font-size:0.72rem; color:var(--tx2); line-height:1.5; border-top:1px dashed var(--b1); padding-top:6px; margin-top:2px; text-align:left;">
+                ${typeof marked !== 'undefined' ? marked.parse(aText) : e(aText)}
+              </div>
+            `;
+            el.appendChild(card);
+          });
+        } else {
+          el.innerHTML = `<div style="font-size:0.75rem; color:var(--tx2); line-height:1.65; background:var(--bg3); padding:12px; border-radius:var(--r2); border:1px solid var(--b1);">${typeof marked !== 'undefined' ? marked.parse(viva) : e(viva)}</div>`;
+        }
+      } else {
+        el.innerHTML = '<span style="color:var(--tx3); font-size:0.7rem;">No viva questions generated.</span>';
+      }
+    }
+
+    function toggleVivaAnswer(btn) {
+      const ans = btn.nextElementSibling;
+      const isHidden = ans.classList.toggle('hidden');
+      btn.textContent = isHidden ? 'Reveal Answer' : 'Hide Answer';
+      btn.style.background = isHidden ? 'var(--blue2)' : 'var(--red2)';
+      btn.style.color = isHidden ? 'var(--blue)' : 'var(--red)';
+      btn.style.borderColor = isHidden ? 'rgba(74,158,255,0.2)' : 'rgba(240,96,96,0.2)';
+    }
+
+    let mockInterviewActive = false;
+    function toggleMockInterview() {
+      const btn = g('startInterviewBtn');
+      const pill = g('interviewStatusPill');
+      mockInterviewActive = !mockInterviewActive;
+      
+      btn.textContent = mockInterviewActive ? 'Stop Mock Interview' : 'Start Mock Interview';
+      btn.classList.toggle('playing', mockInterviewActive);
+      pill.classList.toggle('hidden', !mockInterviewActive);
+      
+      chatH = [];
+      g('chist').innerHTML = '';
+      
+      if (mockInterviewActive) {
+        sendMockInterviewPrompt();
+      } else {
+        addBbl('a', 'Mock interview ended. You can resume standard chatbot follow-ups.');
+      }
+    }
+
+    async function sendMockInterviewPrompt() {
+      const th = addThink(); g('sbtn').disabled = true;
+      try {
+        const data = await post('/ask', { 
+          question: "Hello! Let's start the mock interview based on my code. Please ask the first question.", 
+          code: curCode, 
+          language: curLang, 
+          conversation_history: chatH,
+          interview_mode: true 
+        });
+        th.remove(); 
+        addBbl('a', data.answer);
+        chatH.push({ question: "Start mock interview", answer: data.answer });
+      } catch (err) { 
+        th.remove(); 
+        addBbl('a', '⚠ ' + err.message); 
+      } finally { 
+        g('sbtn').disabled = false; 
+      }
+    }
+
+    function downloadPDFReport() {
+      if (!curCode) {
+        showToast('Please analyze some code first.');
+        return;
+      }
+      
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      const margin = 15;
+      let y = 20;
+      const pageHeight = doc.internal.pageSize.height;
+      const pageWidth = doc.internal.pageSize.width;
+      
+      function checkPageOverflow(addHeight) {
+        if (y + addHeight > pageHeight - 20) {
+          doc.addPage();
+          y = 20;
+          return true;
+        }
+        return false;
+      }
+
+      // Title
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(22);
+      doc.setTextColor(10, 25, 49);
+      doc.text("Codeyy Lab Report", margin, y);
+      y += 10;
+      
+      // Meta
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "normal");
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Date: ${new Date().toLocaleDateString()} | Language: ${curLang.toUpperCase()}`, margin, y);
+      y += 12;
+
+      // Aim
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.setTextColor(201, 168, 76);
+      doc.text("1. Aim & Concept", margin, y);
+      y += 7;
+      
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "normal");
+      doc.setTextColor(50, 50, 50);
+      const patternText = g('dsa-pattern-desc').innerText || 'Understand program behavior and structure.';
+      const splitPattern = doc.splitTextToSize(patternText, pageWidth - (margin * 2));
+      checkPageOverflow(splitPattern.length * 5);
+      doc.text(splitPattern, margin, y);
+      y += (splitPattern.length * 5) + 8;
+
+      // Algorithm
+      checkPageOverflow(20);
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.setTextColor(201, 168, 76);
+      doc.text("2. Program Algorithm", margin, y);
+      y += 7;
+      
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "normal");
+      doc.setTextColor(50, 50, 50);
+      const algoText = g('lab-algorithm-desc').innerText || 'Not generated.';
+      const splitAlgo = doc.splitTextToSize(algoText, pageWidth - (margin * 2));
+      checkPageOverflow(splitAlgo.length * 5);
+      doc.text(splitAlgo, margin, y);
+      y += (splitAlgo.length * 5) + 8;
+
+      // Source Code
+      checkPageOverflow(30);
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.setTextColor(201, 168, 76);
+      doc.text("3. Source Code Listing", margin, y);
+      y += 7;
+      
+      doc.setFont("Courier", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(70, 80, 95);
+      const splitCode = doc.splitTextToSize(curCode, pageWidth - (margin * 2));
+      
+      splitCode.forEach(line => {
+        checkPageOverflow(4.5);
+        doc.text(line, margin, y);
+        y += 4.5;
+      });
+      y += 8;
+
+      // Complexity
+      doc.setFont("Helvetica", "normal");
+      checkPageOverflow(30);
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.setTextColor(201, 168, 76);
+      doc.text("4. Complexity Analysis", margin, y);
+      y += 7;
+      
+      doc.setFontSize(10);
+      doc.setFont("Helvetica", "normal");
+      doc.setTextColor(50, 50, 50);
+      const timeComp = "Time Complexity: " + g('timeBdg').innerText + " - " + g('timeDet').innerText;
+      const spaceComp = "Space Complexity: " + g('spaceBdg').innerText + " - " + g('spaceDet').innerText;
+      
+      doc.text(timeComp, margin, y);
+      y += 5;
+      doc.text(spaceComp, margin, y);
+      y += 12;
+
+      // Viva Voce
+      checkPageOverflow(30);
+      doc.setFontSize(14);
+      doc.setFont("Helvetica", "bold");
+      doc.setTextColor(201, 168, 76);
+      doc.text("5. Viva Voce Questions & Exercises", margin, y);
+      y += 7;
+      
+      doc.setFontSize(9.5);
+      doc.setFont("Helvetica", "normal");
+      doc.setTextColor(50, 50, 50);
+      
+      const vivaItems = [];
+      document.querySelectorAll('#lab-viva-list > div').forEach(div => {
+        const q = div.firstElementChild.innerText;
+        const a = div.lastElementChild.innerText;
+        vivaItems.push(q + "\n" + a);
+      });
+      
+      if (vivaItems.length > 0) {
+        vivaItems.forEach(item => {
+          const splitItem = doc.splitTextToSize(item, pageWidth - (margin * 2));
+          checkPageOverflow(splitItem.length * 4.5 + 4);
+          doc.text(splitItem, margin, y);
+          y += (splitItem.length * 4.5) + 6;
+        });
+      } else {
+        doc.text("No viva questions generated.", margin, y);
+      }
+
+      doc.save(`Lab_Report_${curLang}_${Date.now()}.pdf`);
+      showToast("Lab Report PDF downloaded successfully!");
+    }
     function onQK(ev) { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); sendQ(); } }
     function autoH(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
     function addBbl(type, text) {
       const h = g('chist'), d = ce('div'); d.className = `cbbl ${type}`;
-      d.innerHTML = `<span class="clbl">${type === 'q' ? 'You' : 'Codeyy AI'}</span><div class="ccnt">${e(text).replace(/\n/g, '<br>')}</div>`;
+      const renderedText = type === 'q' ? e(text).replace(/\n/g, '<br>') : (typeof marked !== 'undefined' ? marked.parse(text) : e(text).replace(/\n/g, '<br>'));
+      d.innerHTML = `<span class="clbl">${type === 'q' ? 'You' : 'Codeyy AI'}</span><div class="ccnt">${renderedText}</div>`;
       h.appendChild(d); h.scrollTop = h.scrollHeight; return d;
     }
     function addThink() {

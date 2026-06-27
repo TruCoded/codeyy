@@ -33,6 +33,14 @@ async def test_all():
         print(f"  Flowchart returned (length={len(res.get('flowchart', ''))}):")
         print(res.get("flowchart")[:100] + "...")
         print(f"  Time complexity: {res.get('time_complexity')}")
+        print("\n--- NEW LEARNING PLATFORM FIELDS ---")
+        print(f"  DSA Pattern: {res.get('dsa_pattern')}")
+        print(f"  LeetCode Problems: {res.get('leetcode_problems')}")
+        print(f"  Practice Exercises: {res.get('practice_exercises')}")
+        print(f"  Interview Questions: {res.get('interview_questions')}")
+        print(f"  Algorithm: {res.get('algorithm')}")
+        print(f"  Viva Questions: {res.get('viva_questions')}")
+        print("------------------------------------\n")
     except Exception as e:
         print(f"[FAIL] analyze_code failed: {e}")
         

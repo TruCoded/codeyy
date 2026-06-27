@@ -16,7 +16,7 @@ import base64
 import traceback
 import asyncio
 
-from ai_service import analyze_code, ask_followup, extract_code_from_image, refactor_code, generate_comments_for_code
+from ai_service import analyze_code, ask_followup, extract_code_from_image, refactor_code, generate_comments_for_code, detect_language
 
 app = FastAPI(title="Codeyy (Gemini)", version="4.1.0")
 
@@ -56,6 +56,7 @@ class AskRequest(BaseModel):
     code:                 str
     language:             str
     conversation_history: list = []
+    interview_mode:       Optional[bool] = False
 
 class KeyConfigRequest(BaseModel):
     api_key: str
@@ -68,6 +69,9 @@ class RefactorRequest(BaseModel):
 class CommentsRequest(BaseModel):
     code:              str
     language:          str
+
+class DetectRequest(BaseModel):
+    code:              str
 
 
 # ── Health ──────────────────────────────────────────────────────────────────
@@ -161,6 +165,19 @@ async def save_api_key(req: KeyConfigRequest, request: Request):
     return JSONResponse({"status": "ok", "message": "API key saved successfully"})
 
 
+# ── /detect ─────────────────────────────────────────────────────────────────
+
+@app.post("/detect")
+async def detect(req: DetectRequest, request: Request):
+    user_key = request.headers.get("X-Gemini-API-Key", "")
+    try:
+        lang = await detect_language(req.code.strip()[:1000], api_key=user_key)
+        return JSONResponse({"language": lang.lower().strip().replace("`", "")})
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(500, f"Detection error: {e}")
+
+
 # ── /analyze ────────────────────────────────────────────────────────────────
 
 @app.post("/analyze")
@@ -183,7 +200,20 @@ async def analyze(req: AnalyzeRequest, request: Request):
         raise HTTPException(400, "No code provided.")
 
     try:
-        result = await analyze_code(code, req.language, api_key=user_key)
+        lang = req.language
+        detected_lang = None
+        if lang == "auto":
+            try:
+                detected_lang = await detect_language(code, api_key=user_key)
+                detected_lang = detected_lang.lower().strip().replace("`", "")
+                # Fallback to standard name
+                lang = detected_lang
+            except Exception as e:
+                print(f"Auto-detect language failed, falling back to python: {e}")
+                lang = "python"
+        
+        result = await analyze_code(code, lang, api_key=user_key)
+        result["detected_language"] = detected_lang or lang
         result["extracted_code"] = code if req.image_base64 else None
         return JSONResponse(result)
     except Exception as e:
@@ -201,12 +231,21 @@ async def ask(req: AskRequest, request: Request):
         raise HTTPException(400, "No code context.")
     user_key = request.headers.get("X-Gemini-API-Key", "")
     try:
+        lang = req.language
+        if lang == "auto":
+            try:
+                detected = await detect_language(req.code.strip(), api_key=user_key)
+                lang = detected.lower().strip().replace("`", "")
+            except Exception as e:
+                print(f"Auto-detect in Q&A failed, fallback to python: {e}")
+                lang = "python"
         answer = await ask_followup(
             req.question.strip(),
             req.code.strip(),
-            req.language,
+            lang,
             req.conversation_history,
             api_key=user_key,
+            interview_mode=req.interview_mode or False
         )
         return JSONResponse({"answer": answer})
     except Exception as e:
@@ -223,9 +262,17 @@ async def refactor(req: RefactorRequest, request: Request):
         raise HTTPException(400, "No code provided.")
     user_key = request.headers.get("X-Gemini-API-Key", "")
     try:
+        lang = req.language
+        if lang == "auto":
+            try:
+                detected = await detect_language(code, api_key=user_key)
+                lang = detected.lower().strip().replace("`", "")
+            except Exception as e:
+                print(f"Auto-detect in refactoring failed, fallback to python: {e}")
+                lang = "python"
         result = await refactor_code(
             code,
-            req.language,
+            lang,
             req.target_complexity,
             api_key=user_key,
         )
@@ -244,9 +291,17 @@ async def comments(req: CommentsRequest, request: Request):
         raise HTTPException(400, "No code provided.")
     user_key = request.headers.get("X-Gemini-API-Key", "")
     try:
+        lang = req.language
+        if lang == "auto":
+            try:
+                detected = await detect_language(code, api_key=user_key)
+                lang = detected.lower().strip().replace("`", "")
+            except Exception as e:
+                print(f"Auto-detect in comments failed, fallback to python: {e}")
+                lang = "python"
         result = await generate_comments_for_code(
             code,
-            req.language,
+            lang,
             api_key=user_key,
         )
         return JSONResponse(result)
