@@ -1,4 +1,3 @@
-{"id":"readme-fixed","variant":"document"}
 
 # 🚀 Codeyy | AI Code Learning Platform
 
@@ -14,7 +13,7 @@ Whether you're learning DSA, debugging assignments, preparing for technical inte
 
 ## 🎥 Demo
 
-![Codeyy Demo](codeyy\(1\).gif)
+![Codeyy Demo](demo.gif)
 
 ---
 
