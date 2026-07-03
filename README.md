@@ -155,7 +155,7 @@ Building Codeyy involved solving several practical product and integration chall
 * DSA Learners
 * Technical Interview Preparation
 * Engineering Lab Practicals
-* Self-Learners
+* Self Learners
 * Developers exploring unfamiliar code
 
 ---
