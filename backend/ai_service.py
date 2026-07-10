@@ -54,9 +54,7 @@ async def detect_language(code: str, api_key: str = None) -> str:
     return await _call()
 
 
-# ── MEGA PROMPT ─────────────────────────────────────────────────────────────
-
-def get_mega_prompt(code: str, lang: str) -> str:
+def get_explain_prompt(code: str, lang: str) -> str:
     lines = "\n".join(f"Line {i+1}: {l}" for i, l in enumerate(code.split("\n")))
     engineer_role = f"senior {lang} engineer" if lang and lang.lower() != "auto" else "senior software engineer"
     return f"""You are a {engineer_role}. Analyze this code.
@@ -80,42 +78,6 @@ BUG_DETECTION_END
 CORRECTED_CODE_START
 [Full corrected code or CLEAN]
 CORRECTED_CODE_END
-
-DRY_RUN_START
-[Provide a step-by-step trace execution of the code as a clean JSON array (no markdown code blocks, output raw valid JSON only). Each object in the array represents a single step in execution and must follow this structure:
-{{
-  "step": number (1-based index),
-  "line": number (line number currently executing),
-  "action": "clear humanoid explanation of what happens on this line in 1 short sentence",
-  "variables": {{ "variable_name": value, ... }},
-  "ds_type": "none" | "array" | "stack" | "queue" | "linkedlist" | "tree" | "graph" | "recursion",
-  "ds_data": [
-     // For array/stack/queue: current list of values, e.g. [12, 45, 9] or ["a", "b"]
-     // For linkedlist: nodes in sequence, e.g. [10, 20, 30]
-     // For recursion: current function call stack, e.g. ["fib(3)", "fib(2)"]
-     // For tree/graph: list of active parent-child relationships, e.g. [["A", "B"], ["A", "C"]]
-  ]
-}}
-End the array with a step representing the final return/output value.]
-DRY_RUN_END
-
-FLOWCHART_START
-[Generate a beautiful, logical Mermaid.js control flow diagram (graph TD) showing the execution flow of the code. 
-Use clean shapes and semantic nodes:
-- Start/End steps: Use rounded brackets with double-quoted labels like `A("Start"):::startEnd` or `Z("End"):::startEnd`.
-- Conditionals/Decisions: Use brace nodes with double-quoted labels like `B{{"Is condition met?"}}:::decision` (write this with double curly braces) and label paths clearly using `-- Yes -->` or `-- No -->`.
-- Standard statements/process: Use square brackets with double-quoted labels like `C["Process/Action"]:::default`.
-
-CRITICAL SAFETY RULES FOR MERMAID:
-1. You MUST enclose all node labels inside double quotes (e.g. B{{"Is x > y?"}} or C["sum = a + b"]). Do NOT output unquoted text inside brackets or curly braces.
-2. Do NOT use parentheses `()`, braces `{{}}`, or square brackets `[]` inside the double quotes of a node label. Instead, describe the action in plain English (e.g. write `C["Find element in map"]` instead of `C["map.find(x)"]`).
-
-Include these class definitions in the flowchart output to apply our custom color theme:
-classDef default fill:#122858,stroke:#3ecfb2,stroke-width:1.5px,color:#f3f5ed;
-classDef decision fill:#0f2348,stroke:#c9a84c,stroke-width:1.5px,color:#c9a84c;
-classDef startEnd fill:#0c1e3a,stroke:#4a9eff,stroke-width:1.5px,color:#4a9eff;
-]
-FLOWCHART_END
 
 TIME_COMPLEXITY_START
 [Big-O and 1 sentence]
@@ -142,7 +104,7 @@ PRACTICE_EXERCISES_START
 PRACTICE_EXERCISES_END
 
 INTERVIEW_QUESTIONS_START
-[Generate 3-5 technical interview questions an interviewer would ask about this code. Focus on edge cases, scaling limits, and structural design choices. List questions clearly.]
+[Generate 3-5 technical interview questions an interviewer would ask about this code. Focus on edge cases, scaling limits, and structural design choices. List questions clearly. For each question, also generate a detailed, clear answer. Format them strictly as Q: <question> followed by A: <answer> on newlines, just like in VIVA_QUESTIONS.]
 INTERVIEW_QUESTIONS_END
 
 ALGORITHM_START
@@ -152,6 +114,67 @@ ALGORITHM_END
 VIVA_QUESTIONS_START
 [Generate 5 classic oral exam (Viva Voce) questions that a college professor or lab examiner would ask about this code. For each question, output the Question and the Answer. Format them clearly with Q: and A: on newlines.]
 VIVA_QUESTIONS_END"""
+
+
+def get_dry_run_prompt(code: str, lang: str, test_case: str = None) -> str:
+    lines = "\n".join(f"Line {i+1}: {l}" for i, l in enumerate(code.split("\n")))
+    engineer_role = f"senior {lang} engineer" if lang and lang.lower() != "auto" else "senior software engineer"
+    test_case_instruction = ""
+    if test_case:
+        test_case_instruction = f"\nTrace the code execution specifically using the following user-provided sample test case/input: {test_case}\n"
+        
+    return f"""You are a {engineer_role}. Trace the execution of this code.{test_case_instruction}
+Output your response using ONLY these tagged sections. You MUST include every single section block from DRY_RUN to RECURSION_TREE in your output.
+
+CODE:
+{lines}
+
+DRY_RUN_START
+[Provide a step-by-step trace execution of the code as a clean JSON array (no markdown code blocks, output raw valid JSON only). Each object in the array represents a single step in execution and must follow this structure:
+{{
+  "step": number (1-based index),
+  "line": number (line number currently executing),
+  "action": "clear humanoid explanation of what happens on this line in 1 short sentence",
+  "variables": {{ "variable_name": value, ... }},
+  "ds_type": "none" | "array" | "stack" | "queue" | "linkedlist" | "tree" | "graph" | "recursion" | "map" | "set",
+  "ds_data": [
+     // For array/stack/queue: current list of values, e.g. [12, 45, 9] or ["a", "b"]
+     // For linkedlist: nodes in sequence, e.g. [10, 20, 30]
+     // For recursion: current function call stack, e.g. ["fib(3)", "fib(2)"]
+     // For tree/graph: list of active parent-child relationships, e.g. [["A", "B"], ["A", "C"]]
+     // For map: current key-value mapping as a dictionary/object, e.g. {{ "2": 0, "7": 1 }}
+     // For set: current unique set elements as a list, e.g. [2, 7]
+  ]
+}}
+
+CRITICAL VISUALIZATION RULES:
+1. If the code uses, traverses, or modifies any array, vector, list, or string (like search, sort, two-sum, reverse, sub-array, etc.), you MUST set "ds_type": "array" and "ds_data" to the current state of that array (e.g. [2, 7, 11, 15] or [0, 1, 1, 0, 1]). You MUST track the pointer indices (like i, j, k, low, mid, high, left, right, slow, fast) inside the "variables" object (e.g. {{"i": 1, "target": 9}}) so the frontend can float pointer arrows above/below the array boxes.
+2. If the code uses a map, dictionary, or set (like std::map, unordered_map, set, dict), set "ds_type": "map" or "ds_type": "set". Set "ds_data" to the key-value dictionary (e.g. {{ "2": 0, "7": 1 }}) or set element array (e.g. [2, 7]).
+3. End the array with a step representing the final return/output value.]
+DRY_RUN_END
+
+FLOWCHART_START
+[Generate a beautiful, logical Mermaid.js control flow diagram (graph TD) showing the execution flow of the code. 
+Use clean shapes and semantic nodes:
+- Start/End steps: Use rounded brackets with double-quoted labels like `A("Start"):::startEnd` or `Z("End"):::startEnd`.
+- Conditionals/Decisions: Use brace nodes with double-quoted labels like `B{{"Is condition met?"}}:::decision` (write this with double curly braces) and label paths clearly using `-- Yes -->` or `-- No -->`.
+- Standard statements/process: Use square brackets with double-quoted labels like `C["Process/Action"]:::default`.
+
+Include these class definitions in the flowchart output to apply our custom color theme:
+classDef default fill:#122858,stroke:#3ecfb2,stroke-width:1.5px,color:#f3f5ed;
+classDef decision fill:#0f2348,stroke:#c9a84c,stroke-width:1.5px,color:#c9a84c;
+classDef startEnd fill:#0c1e3a,stroke:#4a9eff,stroke-width:1.5px,color:#4a9eff;
+]
+FLOWCHART_END
+
+RECURSION_TREE_START
+[If the code uses recursion, generate a beautiful, logical Mermaid.js graph TD diagram representing the recursion tree of the execution with the actual arguments and values. Use custom color classes. If the code does not use recursion, write RECURSION_NONE.
+Include these class definitions in the flowchart output to apply our custom color theme:
+classDef default fill:#122858,stroke:#3ecfb2,stroke-width:1.5px,color:#f3f5ed;
+classDef decision fill:#0f2348,stroke:#c9a84c,stroke-width:1.5px,color:#c9a84c;
+classDef startEnd fill:#0c1e3a,stroke:#4a9eff,stroke-width:1.5px,color:#4a9eff;
+]
+RECURSION_TREE_END"""
 
 
 def _extract(text: str, start: str, end: str) -> str:
@@ -166,37 +189,43 @@ def _extract(text: str, start: str, end: str) -> str:
         return ""
 
 
-async def analyze_code(code: str, language: str, api_key: str = None) -> dict:
+async def analyze_code(code: str, language: str, test_case: str = None, api_key: str = None) -> dict:
     client = get_client(api_key)
-    prompt = get_mega_prompt(code, language)
     
-    # Single attempt with short retry
-    for attempt in range(2):
-        try:
-            response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
-            r = response.text
-            return {
-                "detected_language": _extract(r, "DETECTED_LANGUAGE_START", "DETECTED_LANGUAGE_END"),
-                "line_explanations": _extract(r, "LINE_EXPLANATIONS_START", "LINE_EXPLANATIONS_END"),
-                "bug_detection":     _extract(r, "BUG_DETECTION_START",     "BUG_DETECTION_END"),
-                "corrected_code":    _extract(r, "CORRECTED_CODE_START",    "CORRECTED_CODE_END"),
-                "dry_run":           _extract(r, "DRY_RUN_START",           "DRY_RUN_END"),
-                "flowchart":         _extract(r, "FLOWCHART_START",         "FLOWCHART_END"),
-                "time_complexity":   _extract(r, "TIME_COMPLEXITY_START",   "TIME_COMPLEXITY_END"),
-                "space_complexity":  _extract(r, "SPACE_COMPLEXITY_START",  "SPACE_COMPLEXITY_END"),
-                "suggestions":       _extract(r, "SUGGESTIONS_START",       "SUGGESTIONS_END"),
-                "dsa_pattern":       _extract(r, "DSA_PATTERN_START",       "DSA_PATTERN_END"),
-                "leetcode_problems": _extract(r, "LEETCODE_PROBLEMS_START", "LEETCODE_PROBLEMS_END"),
-                "practice_exercises":_extract(r, "PRACTICE_EXERCISES_START", "PRACTICE_EXERCISES_END"),
-                "interview_questions":_extract(r, "INTERVIEW_QUESTIONS_START", "INTERVIEW_QUESTIONS_END"),
-                "algorithm":         _extract(r, "ALGORITHM_START",         "ALGORITHM_END"),
-                "viva_questions":    _extract(r, "VIVA_QUESTIONS_START",    "VIVA_QUESTIONS_END"),
-            }
-        except Exception as e:
-            if "429" in str(e) and attempt == 0:
-                await asyncio.sleep(5)
-            else:
-                raise e
+    prompt1 = get_explain_prompt(code, language)
+    prompt2 = get_dry_run_prompt(code, language, test_case)
+    
+    async def call_gemini(prompt: str):
+        for attempt in range(2):
+            try:
+                response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
+                return response.text
+            except Exception as e:
+                if "429" in str(e) and attempt == 0:
+                    await asyncio.sleep(5)
+                else:
+                    raise e
+
+    r1, r2 = await asyncio.gather(call_gemini(prompt1), call_gemini(prompt2))
+    
+    return {
+        "detected_language": _extract(r1, "DETECTED_LANGUAGE_START", "DETECTED_LANGUAGE_END"),
+        "line_explanations": _extract(r1, "LINE_EXPLANATIONS_START", "LINE_EXPLANATIONS_END"),
+        "bug_detection":     _extract(r1, "BUG_DETECTION_START",     "BUG_DETECTION_END"),
+        "corrected_code":    _extract(r1, "CORRECTED_CODE_START",    "CORRECTED_CODE_END"),
+        "dry_run":           _extract(r2, "DRY_RUN_START",           "DRY_RUN_END"),
+        "flowchart":         _extract(r2, "FLOWCHART_START",         "FLOWCHART_END"),
+        "recursion_tree":    _extract(r2, "RECURSION_TREE_START",    "RECURSION_TREE_END"),
+        "time_complexity":   _extract(r1, "TIME_COMPLEXITY_START",   "TIME_COMPLEXITY_END"),
+        "space_complexity":  _extract(r1, "SPACE_COMPLEXITY_START",  "SPACE_COMPLEXITY_END"),
+        "suggestions":       _extract(r1, "SUGGESTIONS_START",       "SUGGESTIONS_END"),
+        "dsa_pattern":       _extract(r1, "DSA_PATTERN_START",       "DSA_PATTERN_END"),
+        "leetcode_problems": _extract(r1, "LEETCODE_PROBLEMS_START", "LEETCODE_PROBLEMS_END"),
+        "practice_exercises":_extract(r1, "PRACTICE_EXERCISES_START", "PRACTICE_EXERCISES_END"),
+        "interview_questions":_extract(r1, "INTERVIEW_QUESTIONS_START", "INTERVIEW_QUESTIONS_END"),
+        "algorithm":         _extract(r1, "ALGORITHM_START",         "ALGORITHM_END"),
+        "viva_questions":    _extract(r1, "VIVA_QUESTIONS_START",    "VIVA_QUESTIONS_END"),
+    }
 
 
 async def refactor_code(code: str, language: str, target_complexity: str, api_key: str = None) -> dict:

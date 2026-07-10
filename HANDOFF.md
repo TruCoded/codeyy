@@ -5,9 +5,12 @@
 **CodeVision** is a local AI-powered code analysis web app. You paste code (or upload a screenshot), click Analyze, and get:
 - Line-by-line explanations
 - Bug detection with fixes
-- Step-by-step dry-run execution trace
+- Step-by-step dry-run execution trace with active pointer arrows (e.g., low, mid, high)
+- Recursion Tree visualization for recursive calls
+- Support for custom dry-run test cases/arrays
 - Time & space complexity (Big-O)
 - Optimization suggestions
+- Collapsible/revealable technical interview prep questions
 - Follow-up Q&A chatbot
 
 **This version uses Google Gemini (gemini-1.5-flash) — which has a generous FREE tier.**
@@ -81,7 +84,7 @@ python-multipart>=0.0.9     ← File upload support
 
 | Function | What it does |
 |---|---|
-| `analyze_code(code, lang)` | Runs 2 Gemini calls in parallel — one for explanations+bugs+fixes, one for dry-run+complexity+suggestions |
+| `analyze_code(code, lang, test_case)` | Runs 2 Gemini calls in parallel — first for explanations+bugs+fixes, second for dry-run (using custom test_case if provided)+recursion tree+complexity+suggestions |
 | `extract_code_from_image(bytes)` | Sends image to Gemini Vision to extract code text |
 | `ask_followup(question, code, lang, history)` | Single Gemini call for Q&A with conversation history |
 

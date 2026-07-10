@@ -50,6 +50,7 @@ class AnalyzeRequest(BaseModel):
     image_base64:     Optional[str] = None
     image_media_type: Optional[str] = "image/png"
     language:         str           = "python"
+    test_case:        Optional[str] = None
 
 class AskRequest(BaseModel):
     question:             str
@@ -173,7 +174,7 @@ async def analyze(req: AnalyzeRequest, request: Request):
                 print(f"Auto-detect language failed, falling back to python: {e}")
                 lang = "python"
         
-        result = await analyze_code(code, lang, api_key=user_key)
+        result = await analyze_code(code, lang, test_case=req.test_case, api_key=user_key)
         result["detected_language"] = detected_lang or lang
         result["extracted_code"] = code if req.image_base64 else None
         return JSONResponse(result)
