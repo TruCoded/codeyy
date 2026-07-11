@@ -1,17 +1,18 @@
-# CodeVision — Gemini Edition: Complete Handoff Document
+# Codeyy — Gemini Edition: Complete Handoff Document
 
 ## What Is This?
 
-**CodeVision** is a local AI-powered code analysis web app. You paste code (or upload a screenshot), click Analyze, and get:
-- Line-by-line explanations
-- Bug detection with fixes
-- Step-by-step dry-run execution trace with active pointer arrows (e.g., low, mid, high)
-- Recursion Tree visualization for recursive calls
-- Support for custom dry-run test cases/arrays
-- Time & space complexity (Big-O)
-- Optimization suggestions
-- Collapsible/revealable technical interview prep questions
-- Follow-up Q&A chatbot
+**Codeyy** is a local AI-powered code analysis and learning web app. You paste code (or upload a screenshot), click Analyze, and get:
+- **Line-by-Line Explanations & Bug Fixes** with code highlights.
+- **Interactive Dry-Run Execution Trace** with active pointer arrows (e.g., `low`, `mid`, `high`).
+- **Data Structure Visualizers** for Maps, Sets, Trees, and general variables.
+- **Recursion Tree Visualizations** using Mermaid.js.
+- **Time & Space Complexity Analysis** (Big-O notation).
+- **DSA Learning Mode** (concept detection, LeetCode recommendations, and practice questions).
+- **Interview Prep Mode** with collapsible AI interviewer questions and edge cases.
+- **Lab Assistant Mode** generating algorithms, pseudocode, Viva Voce questions, and printable Lab Report PDFs.
+- **Touch-Friendly Resizable Split Panels** with double-click/double-tap toggle support.
+- **Follow-up Context-Aware Chatbot** to ask questions.
 
 **This version uses Google Gemini (gemini-1.5-flash) — which has a generous FREE tier.**
 
@@ -20,13 +21,14 @@
 ## File Structure
 
 ```
-codevision/
+codeyy/
 ├── backend/
 │   ├── main.py           ← FastAPI server (routes, health check)
 │   ├── ai_service.py     ← All Gemini API calls (analysis, OCR, Q&A)
+│   ├── test_mock_ai.py   ← Mock testing suite for AI service
 │   └── requirements.txt  ← Python dependencies
 ├── frontend/
-│   └── index.html        ← Entire UI (single self-contained file)
+│   └── index.html        ← Entire UI (single self-contained file with HTML, CSS, JS)
 ├── start_windows.bat     ← Double-click to run on Windows
 └── start_mac_linux.sh    ← Run on Mac/Linux
 ```
@@ -84,7 +86,7 @@ python-multipart>=0.0.9     ← File upload support
 
 | Function | What it does |
 |---|---|
-| `analyze_code(code, lang, test_case)` | Runs 2 Gemini calls in parallel — first for explanations+bugs+fixes, second for dry-run (using custom test_case if provided)+recursion tree+complexity+suggestions |
+| `analyze_code(code, lang, test_case)` | Runs 2 Gemini calls in parallel — first for explanations+bugs+fixes, second for dry-run (using custom test_case if provided)+recursion tree+complexity+suggestions+DSA mode+Interview prep+Lab assistant |
 | `extract_code_from_image(bytes)` | Sends image to Gemini Vision to extract code text |
 | `ask_followup(question, code, lang, history)` | Single Gemini call for Q&A with conversation history |
 
@@ -109,7 +111,7 @@ Paste this prompt:
 
 ---
 
-> I have a code analysis web app called CodeVision that uses Gemini instead of Anthropic. Here are the 3 backend files. Please help me with [your question].
+> I have a code analysis web app called Codeyy that uses Gemini instead of Anthropic. Here are the 3 backend files. Please help me with [your question].
 >
 > **backend/ai_service.py:** [paste content]
 > **backend/main.py:** [paste content]

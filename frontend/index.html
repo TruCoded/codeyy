@@ -245,6 +245,17 @@
     .resizer:hover, .resizer.dragging {
       background: rgba(201, 168, 76, 0.12);
     }
+    /* Invisible touch target extension for mobile hands */
+    .resizer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -10px;
+      right: -10px;
+      cursor: col-resize;
+      z-index: 1;
+    }
     .resizer::after {
       content: '⋮';
       color: var(--tx3);
@@ -252,6 +263,7 @@
       font-weight: 700;
       pointer-events: none;
       transition: color 0.25s;
+      z-index: 2;
     }
     .resizer:hover::after, .resizer.dragging::after {
       color: var(--gold);
@@ -1686,8 +1698,16 @@
 
     @media(max-width:920px) {
       .layout {
-        grid-template-columns: 1fr;
-        padding: 10px
+        flex-direction: column;
+        padding: 10px;
+        gap: 16px;
+      }
+      .layout > section.panel {
+        width: 100% !important;
+        flex: none !important;
+      }
+      .resizer {
+        display: none !important;
       }
 
       .pr {
@@ -2577,33 +2597,69 @@
         let startX = 0;
         let leftWidth = 0;
 
-        const mouseDownHandler = function(e) {
-          startX = e.clientX;
+        const startDragging = function(clientX) {
+          startX = clientX;
           leftWidth = leftSide.getBoundingClientRect().width;
           resizer.classList.add('dragging');
+        };
+
+        const drag = function(clientX) {
+          const dx = clientX - startX;
+          const newLeftWidth = leftWidth + dx;
+          const containerWidth = resizer.parentNode.getBoundingClientRect().width;
+          const pct = (newLeftWidth / containerWidth) * 100;
+          if (pct > 5 && pct < 95) {
+            leftSide.style.width = `calc(${pct}% - 8px)`;
+            rightSide.style.flex = '1 1 0%';
+          }
+        };
+
+        const stopDragging = function() {
+          resizer.classList.remove('dragging');
+        };
+
+        // Mouse handlers
+        const mouseDownHandler = function(e) {
+          startDragging(e.clientX);
           document.addEventListener('mousemove', mouseMoveHandler);
           document.addEventListener('mouseup', mouseUpHandler);
           e.preventDefault();
         };
 
         const mouseMoveHandler = function(e) {
-          const dx = e.clientX - startX;
-          const newLeftWidth = leftWidth + dx;
-          const containerWidth = resizer.parentNode.getBoundingClientRect().width;
-          const pct = (newLeftWidth / containerWidth) * 100;
-          if (pct > 20 && pct < 80) {
-            leftSide.style.width = `calc(${pct}% - 8px)`;
-            rightSide.style.flex = '1 1 0%';
-          }
+          drag(e.clientX);
         };
 
         const mouseUpHandler = function() {
-          resizer.classList.remove('dragging');
+          stopDragging();
           document.removeEventListener('mousemove', mouseMoveHandler);
           document.removeEventListener('mouseup', mouseUpHandler);
         };
 
         resizer.addEventListener('mousedown', mouseDownHandler);
+
+        // Touch handlers (Mobile)
+        const touchStartHandler = function(e) {
+          if (e.touches.length === 0) return;
+          startDragging(e.touches[0].clientX);
+          document.addEventListener('touchmove', touchMoveHandler, { passive: false });
+          document.addEventListener('touchend', touchEndHandler);
+          e.preventDefault();
+        };
+
+        const touchMoveHandler = function(e) {
+          if (e.touches.length === 0) return;
+          drag(e.touches[0].clientX);
+          e.preventDefault();
+        };
+
+        const touchEndHandler = function() {
+          stopDragging();
+          document.removeEventListener('touchmove', touchMoveHandler);
+          document.removeEventListener('touchend', touchEndHandler);
+        };
+
+        resizer.addEventListener('touchstart', touchStartHandler, { passive: false });
       }
 
       // Require local key validation
@@ -3908,7 +3964,17 @@
 
     function showLoader() { hide('emptyState'); hide('results'); show('loader'); }
     function hideLoader() { hide('loader'); }
-    function showResults() { show('results'); }
+    function showResults() {
+      show('results');
+      if (window.innerWidth <= 920) {
+        setTimeout(() => {
+          const rp = g('rp');
+          if (rp) {
+            rp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 150);
+      }
+    }
     function showEmpty() { show('emptyState'); }
     function setBusy(on) { const b = g('abtn'); b.disabled = on; g('abtnTxt').textContent = on ? 'Analyzing…' : 'Analyze Code'; }
     function showErr(msg) { g('errtxt').textContent = msg; show('errbar'); setTimeout(() => hide('errbar'), 9000); }

@@ -38,11 +38,11 @@ Whether you're debugging code, preparing for interviews, practicing DSA, or comp
 | Module            | Capabilities                                                                                                                |
 | :---------------- | :-------------------------------------------------------------------------------------------------------------------------- |
 | 🧠 Explain        | Line-by-line explanations, bug detection, corrected code, complexity analysis, optimization suggestions, AI code comments.  |
-| ⚡ Dry Run         | Step-by-step execution tracing, variable tracking, data structure visualization, recursion visualization, logic flowcharts. |
+| ⚡ Dry Run         | Step-by-step execution tracing, variable tracking, data structure visualization (including Maps, Sets, and Trees), recursion tree visualization, logic flowcharts. |
 | 📚 DSA Learning   | DSA concept detection, algorithm explanations, LeetCode recommendations, AI-generated practice questions.                   |
 | 🎤 Interview Prep | AI interviewer questions, mock technical interviews, edge case discussions, optimization challenges.                        |
 | 🎓 Lab Assistant  | Algorithm generation, pseudocode, Viva Voce questions, printable Lab Report PDFs.                                           |
-| 🛠 Utilities      | Screenshot-to-code, automatic language detection, multi-language support, context-aware AI chat.                            |
+| 🛠 Utilities      | Screenshot-to-code, automatic language detection, touch-friendly resizable split panels (drag to resize), multi-language support, context-aware AI chat.                            |
 
 ---
 
@@ -58,31 +58,23 @@ Codeyy combines AI-powered analysis, visual execution, DSA guidance, interview p
 
 ```mermaid
 graph LR
-
-A[User]
---> B[Frontend UI]
-
-B --> C[FastAPI Backend]
-
-C --> D[Language Detection]
-
-D --> E[Gemini AI Engine]
-
-E --> F[Response Parser]
-
-F --> G[Explain]
-F --> H[Dry Run]
-F --> I[Refactor]
-F --> J[DSA Mode]
-F --> K[Interview Prep]
-F --> L[Lab Assistant]
-
-G --> M[Interactive Dashboard]
-H --> M
-I --> M
-J --> M
-K --> M
-L --> M
+    A[User] --> B[Frontend UI]
+    B --> C[FastAPI Backend]
+    C --> D[Language Detection]
+    D --> E[Gemini AI Engine]
+    E --> F[Response Parser]
+    F --> G[Explain]
+    F --> H[Dry Run]
+    F --> I[Refactor]
+    F --> J[DSA Mode]
+    F --> K[Interview Prep]
+    F --> L[Lab Assistant]
+    G --> M[Interactive Dashboard]
+    H --> M
+    I --> M
+    J --> M
+    K --> M
+    L --> M
 ```
 
 ---
