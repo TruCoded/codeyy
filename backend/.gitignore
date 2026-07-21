@@ -1,0 +1,11 @@
+# Local backend ignore
+.env
+.env.*
+*.env
+!.env.example
+__pycache__/
+venv/
+.venv/
+env/
+.env/
+*.py[cod]
