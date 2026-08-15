@@ -95,9 +95,21 @@ DSA_PATTERN_START
 [Identify the primary DSA patterns, algorithms, or data structures used in this code, e.g. Sliding Window, DFS, Hash Table, Stack, Binary Search. Provide 1-2 sentences explaining why this pattern fits the problem.]
 DSA_PATTERN_END
 
-LEETCODE_PROBLEMS_START
-[Suggest 3 related LeetCode problems that practice this pattern. For each, output: Title | Link (use standard https://leetcode.com/problems/... urls). Use newlines to separate.]
-LEETCODE_PROBLEMS_END
+PLATFORM_PROBLEMS_START
+[Suggest 4-5 related practice problems for this pattern. CRITICAL MANDATE: You MUST include problems from AT LEAST 3 DIFFERENT PLATFORMS (mix of GeeksforGeeks, HackerRank, Codeforces, Coding Ninjas, Codolio, and LeetCode). DO NOT output only LeetCode links. For each problem, output strictly on a new line: Platform | Title | Link (use actual valid problem URLs like https://www.geeksforgeeks.org/..., https://www.hackerrank.com/..., https://codeforces.com/..., https://leetcode.com/...).]
+PLATFORM_PROBLEMS_END
+
+OPTIMIZED_CODE_START
+[Provide the absolute most optimal version of the analyzed code in terms of time and space complexity. Do NOT use markdown code fences inside this tag.]
+OPTIMIZED_CODE_END
+
+OPTIMIZED_TIME_COMPLEXITY_START
+[State the exact Big-O time complexity of the optimized code, e.g. O(N) linear time.]
+OPTIMIZED_TIME_COMPLEXITY_END
+
+OPTIMIZED_SPACE_COMPLEXITY_START
+[State the exact Big-O space complexity of the optimized code, e.g. O(1) constant space.]
+OPTIMIZED_SPACE_COMPLEXITY_END
 
 PRACTICE_EXERCISES_START
 [Provide 3 practice questions (Beginner, Intermediate, Advanced) that build on this concept. For each, output the difficulty, aim, and a brief sample input/output. Use clean Markdown structure.]
@@ -154,11 +166,13 @@ CRITICAL VISUALIZATION RULES:
 DRY_RUN_END
 
 FLOWCHART_START
-[Generate a beautiful, logical Mermaid.js control flow diagram (graph TD) showing the execution flow of the code. 
-Use clean shapes and semantic nodes:
-- Start/End steps: Use rounded brackets with double-quoted labels like `A("Start"):::startEnd` or `Z("End"):::startEnd`.
-- Conditionals/Decisions: Use brace nodes with double-quoted labels like `B{{"Is condition met?"}}:::decision` (write this with double curly braces) and label paths clearly using `-- Yes -->` or `-- No -->`.
-- Standard statements/process: Use square brackets with double-quoted labels like `C["Process/Action"]:::default`.
+[Generate a clean, valid Mermaid.js control flow diagram (graph TD) showing the execution flow of the code. 
+CRITICAL MERMAID SYNTAX RULES:
+1. ALWAYS wrap ALL node label texts inside double quotes, e.g. `A["Start"]:::startEnd` or `B["Initialize maxi = 0"]:::default`.
+2. NEVER put spaces before `:::` (write `:::default`, NOT ` ::: default`).
+3. DO NOT use semicolons `;` at the end of lines.
+4. If using subgraphs, ALWAYS wrap the subgraph name in double quotes, e.g. `subgraph "findi(root, &maxi)"`.
+5. Label decision paths strictly using `-->|"Yes"|`.
 
 Include these class definitions in the flowchart output to apply our custom color theme:
 classDef default fill:#122858,stroke:#3ecfb2,stroke-width:1.5px,color:#f3f5ed;
@@ -168,7 +182,12 @@ classDef startEnd fill:#0c1e3a,stroke:#4a9eff,stroke-width:1.5px,color:#4a9eff;
 FLOWCHART_END
 
 RECURSION_TREE_START
-[If the code uses recursion, generate a beautiful, logical Mermaid.js graph TD diagram representing the recursion tree of the execution with the actual arguments and values. Use custom color classes. If the code does not use recursion, write RECURSION_NONE.
+[If the code uses recursion, generate a clean, valid Mermaid.js graph TD diagram representing the recursion tree of the execution with the actual arguments and values. Use custom color classes. If the code does not use recursion, write RECURSION_NONE.
+CRITICAL MERMAID SYNTAX RULES:
+1. ALWAYS wrap ALL node label texts in double quotes, e.g. `A["solve(5)"]:::default`.
+2. NEVER put spaces before `:::`.
+3. If using subgraphs, ALWAYS wrap the title in double quotes, e.g. `subgraph "solve(n)"`.
+
 Include these class definitions in the flowchart output to apply our custom color theme:
 classDef default fill:#122858,stroke:#3ecfb2,stroke-width:1.5px,color:#f3f5ed;
 classDef decision fill:#0f2348,stroke:#c9a84c,stroke-width:1.5px,color:#c9a84c;
@@ -196,13 +215,13 @@ async def analyze_code(code: str, language: str, test_case: str = None, api_key:
     prompt2 = get_dry_run_prompt(code, language, test_case)
     
     async def call_gemini(prompt: str):
-        for attempt in range(2):
+        for attempt in range(3):
             try:
                 response = await asyncio.to_thread(client.models.generate_content, model=MODEL_NAME, contents=prompt)
                 return response.text
             except Exception as e:
-                if "429" in str(e) and attempt == 0:
-                    await asyncio.sleep(5)
+                if ("429" in str(e) or "RESOURCE_EXHAUSTED" in str(e)) and attempt < 2:
+                    await asyncio.sleep(4 * (attempt + 1))
                 else:
                     raise e
 
@@ -220,7 +239,10 @@ async def analyze_code(code: str, language: str, test_case: str = None, api_key:
         "space_complexity":  _extract(r1, "SPACE_COMPLEXITY_START",  "SPACE_COMPLEXITY_END"),
         "suggestions":       _extract(r1, "SUGGESTIONS_START",       "SUGGESTIONS_END"),
         "dsa_pattern":       _extract(r1, "DSA_PATTERN_START",       "DSA_PATTERN_END"),
-        "leetcode_problems": _extract(r1, "LEETCODE_PROBLEMS_START", "LEETCODE_PROBLEMS_END"),
+        "platform_problems": _extract(r1, "PLATFORM_PROBLEMS_START", "PLATFORM_PROBLEMS_END"),
+        "optimized_code":    _extract(r1, "OPTIMIZED_CODE_START",    "OPTIMIZED_CODE_END"),
+        "optimized_time_complexity": _extract(r1, "OPTIMIZED_TIME_COMPLEXITY_START", "OPTIMIZED_TIME_COMPLEXITY_END"),
+        "optimized_space_complexity": _extract(r1, "OPTIMIZED_SPACE_COMPLEXITY_START", "OPTIMIZED_SPACE_COMPLEXITY_END"),
         "practice_exercises":_extract(r1, "PRACTICE_EXERCISES_START", "PRACTICE_EXERCISES_END"),
         "interview_questions":_extract(r1, "INTERVIEW_QUESTIONS_START", "INTERVIEW_QUESTIONS_END"),
         "algorithm":         _extract(r1, "ALGORITHM_START",         "ALGORITHM_END"),

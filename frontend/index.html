@@ -65,9 +65,12 @@
       background: var(--bg);
       color: var(--tx1);
       font-family: var(--fb);
+      height: 100vh;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden
+      overflow: hidden
     }
 
     .hidden {
@@ -85,10 +88,10 @@
     }
 
     .hdr {
-      position: sticky;
-      top: 0;
+      position: relative;
       z-index: 100;
       height: 56px;
+      flex-shrink: 0;
       background: rgba(10, 25, 49, .95);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--b1)
@@ -218,14 +221,17 @@
 
     .layout {
       max-width: 1480px;
+      width: 100%;
       margin: 0 auto;
-      padding: 18px 22px;
+      padding: 14px 22px;
       display: flex;
       flex-direction: row;
-      min-height: calc(100vh - 56px);
+      flex: 1 1 0%;
+      height: calc(100vh - 56px);
       position: relative;
       z-index: 1;
       gap: 0;
+      overflow: hidden;
     }
 
     .resizer {
@@ -279,7 +285,8 @@
       gap: 12px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
       position: relative;
-      overflow: hidden
+      height: 100%;
+      overflow-y: auto;
     }
 
     .panel::before {
@@ -292,9 +299,20 @@
       background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .22), transparent)
     }
 
+    .panel::-webkit-scrollbar,
+    .pr::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .panel::-webkit-scrollbar-thumb,
+    .pr::-webkit-scrollbar-thumb {
+      background: var(--b2);
+      border-radius: 2px
+    }
+
     .pr {
       overflow-y: auto;
-      max-height: calc(100vh - 56px - 36px)
+      height: 100%;
     }
 
     .pr::-webkit-scrollbar {
@@ -2090,6 +2108,100 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* Glassmorphic Multi-Platform Dropdown & Optimized Code Container */
+    .dsa-hdr-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .dsa-platform-sel-wr {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .dsa-platform-select {
+      background: var(--bg3);
+      border: 1px solid var(--b2);
+      border-radius: var(--r1);
+      color: var(--tx1);
+      font-family: var(--fui);
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 5px 26px 5px 10px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: all 0.25s ease;
+    }
+
+    .dsa-platform-select:hover {
+      background: var(--bg4);
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 4px 16px rgba(201, 168, 76, 0.15);
+    }
+
+    .dsa-platform-select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+    }
+
+    .optcode-card {
+      background: var(--bg3);
+      border: 1px solid var(--b1);
+      border-radius: var(--r2);
+      padding: 14px;
+      margin-top: 14px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .optcode-card:hover {
+      border-color: rgba(62, 207, 178, 0.3);
+      box-shadow: 0 6px 20px rgba(62, 207, 178, 0.08);
+    }
+
+    .optcode-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .optcode-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .optcode-badge {
+      font-family: var(--fm);
+      font-size: 0.66rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .optcode-badge.time {
+      background: var(--gold2);
+      border: 1px solid rgba(201, 168, 76, 0.25);
+      color: var(--gold);
+    }
+
+    .optcode-badge.space {
+      background: var(--teal2);
+      border: 1px solid rgba(62, 207, 178, 0.25);
+      color: var(--teal);
+    }
   </style>
 </head>
 
@@ -2338,6 +2450,21 @@
           <!-- Suggestions -->
           <div class="slbl"><span class="sd teal"></span>Optimization Suggestions</div>
           <div class="slist" id="slist"></div>
+
+          <!-- Optimized Code Block -->
+          <div id="optcode-card" class="optcode-card hidden">
+            <div class="optcode-hdr">
+              <span class="slbl" style="margin:0;"><span class="sd teal"></span>Optimized Version</span>
+              <button class="cpybtn" onclick="cpyOptimized()">⎘ Copy</button>
+            </div>
+            <div class="optcode-badges">
+              <span class="optcode-badge time" id="optTimeBdg">Time: O(?)</span>
+              <span class="optcode-badge space" id="optSpaceBdg">Space: O(?)</span>
+            </div>
+            <div class="cfwrap" style="margin-top:6px;">
+              <pre class="cfpre" id="optcode-pre" style="color:var(--teal)"></pre>
+            </div>
+          </div>
         </div>
         <div class="osec hidden" id="sec-bugs">
           <div class="slbl"><span class="sd red"></span>Bug &amp; Error Detection</div>
@@ -2431,7 +2558,23 @@
           <div class="slbl"><span class="sd gold"></span>DSA Pattern & Concept</div>
           <div id="dsa-pattern-desc" style="font-size:0.75rem; color:var(--tx2); line-height:1.65; background:var(--bg3); padding:12px; border-radius:var(--r2); border:1px solid var(--b1); margin-bottom:12px;"></div>
           
-          <div class="slbl"><span class="sd blue"></span>LeetCode Practice Problems</div>
+          <div class="dsa-hdr-wrap">
+            <div class="slbl" style="margin:0;"><span class="sd blue"></span>Platform Practice Problems</div>
+            <div class="dsa-platform-sel-wr">
+              <select id="dsa-platform-select" class="dsa-platform-select">
+                <option value="all">⚡ All Platforms</option>
+                <option value="LeetCode">LeetCode</option>
+                <option value="GeeksforGeeks">GeeksforGeeks</option>
+                <option value="HackerRank">HackerRank</option>
+                <option value="Coding Ninjas">Coding Ninjas</option>
+                <option value="Codolio">Codolio</option>
+                <option value="Codeforces">Codeforces</option>
+              </select>
+              <svg class="sel-arr" width="11" height="11" viewBox="0 0 12 12" style="right: 8px;">
+                <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </div>
+          </div>
           <div id="dsa-leetcode-list" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;"></div>
           
           <div class="slbl"><span class="sd teal"></span>Concept Practice Exercises</div>
@@ -2542,6 +2685,7 @@
     let mode = 'code';
     let chatH = [], drSteps = [], drIdx = 0, drTimer = null;
     let currentFlowchartGraph = '', currentRecursionTreeGraph = '';
+    let currentPlatformProblems = [];
 
     // Initialize Mermaid.js
     if (typeof mermaid !== 'undefined') {
@@ -2557,6 +2701,14 @@
       const storedKey = localStorage.getItem('gemini_api_key');
       if (storedKey && (storedKey === 'YOUR_KEY_HERE' || !(storedKey.startsWith('AIzaSy') || storedKey.startsWith('AQ.')))) {
         localStorage.removeItem('gemini_api_key');
+      }
+
+      // Multi-Platform selection dropdown listener
+      const dsaSel = document.getElementById('dsa-platform-select');
+      if (dsaSel) {
+        dsaSel.addEventListener('change', e => {
+          filterPlatformProblems(e.target.value);
+        });
       }
 
       // Load language settings
@@ -3098,11 +3250,15 @@
       if (cached) {
         try {
           const data = JSON.parse(cached);
-          curCode = data.extracted_code || code;
-          renderAll(data); showResults();
-          stab(document.querySelector('.otab[data-tab="explain"]'), 'explain');
-          showToast('✓ Loaded from cache');
-          return;
+          if (data.platform_problems) {
+            curCode = data.extracted_code || code;
+            renderAll(data); showResults();
+            stab(document.querySelector('.otab[data-tab="explain"]'), 'explain');
+            showToast('✓ Loaded from cache');
+            return;
+          } else {
+            sessionStorage.removeItem(cacheKey);
+          }
         } catch (e) {
           sessionStorage.removeItem(cacheKey);
         }
@@ -3138,9 +3294,10 @@
     function renderAll(d) {
       renderExplain(d.line_explanations || ''); renderBugs(d.bug_detection || ''); renderFixed(d.corrected_code || '');
       renderDryRun(d.dry_run || '', d.flowchart || '', d.recursion_tree || ''); renderCx(d.time_complexity || '', d.space_complexity || ''); renderSugg(d.suggestions || '');
+      renderOptimizedCode(d.optimized_code || '', d.optimized_time_complexity || '', d.optimized_space_complexity || '');
       
       // Render New Visual Learning Modes
-      renderDSAMode(d.dsa_pattern || '', d.leetcode_problems || '', d.practice_exercises || '');
+      renderDSAMode(d.dsa_pattern || '', d.platform_problems || d.leetcode_problems || '', d.practice_exercises || '');
       renderInterviewPrep(d.interview_questions || '');
       renderLabAssistant(d.algorithm || '', d.viva_questions || '');
     }
@@ -3301,6 +3458,38 @@
       }
     }
 
+    function sanitizeMermaidGraph(raw) {
+      if (!raw) return '';
+      let clean = raw.trim();
+
+      if (clean.startsWith('```')) {
+        clean = clean.replace(/^```[a-zA-Z]*\n/, '').replace(/\n```$/, '');
+      }
+
+      if (!clean.includes('graph ') && !clean.includes('flowchart ')) {
+        clean = 'graph TD\n' + clean;
+      }
+
+      // Quote unquoted subgraph titles e.g. subgraph findi(root, &maxi) -> subgraph "findi(root, &maxi)"
+      clean = clean.replace(/subgraph\s+(?!["\n])([^\n]+)$/gmi, (match, title) => {
+        let trimmed = title.trim();
+        if (/^[a-zA-Z0-9_]+\s*\[.*\]$/.test(trimmed)) return match;
+        return `subgraph "${trimmed.replace(/"/g, "'")}"`;
+      });
+
+      // Remove spaces before ::: (e.g. ::: default -> :::default)
+      clean = clean.replace(/\s+:::/g, ':::');
+
+      // Remove semicolons at end of lines or after :::className;
+      clean = clean.replace(/:::\s*([a-zA-Z0-9_]+);/g, ':::$1');
+      clean = clean.replace(/;\s*$/gm, '');
+
+      // Fix unquoted arrow labels e.g. -- Yes --> -> -->|"Yes"|
+      clean = clean.replace(/--\s*([^->\n]+?)\s*-->/g, '-->|"$1"|');
+
+      return clean;
+    }
+
     async function renderMermaidRecursionTree() {
       const container = g('mermaid-recursion-graph');
       if (!container) return;
@@ -3309,14 +3498,7 @@
         return;
       }
 
-      let cleanGraph = currentRecursionTreeGraph.trim();
-      if (cleanGraph.startsWith('```')) {
-        cleanGraph = cleanGraph.replace(/^```[a-zA-Z]*\n/, '').replace(/\n```$/, '');
-      }
-
-      if (!cleanGraph.includes('graph ') && !cleanGraph.includes('flowchart ')) {
-        cleanGraph = 'graph TD\n' + cleanGraph;
-      }
+      let cleanGraph = sanitizeMermaidGraph(currentRecursionTreeGraph);
 
       container.innerHTML = `<div class="thinking" style="border:none; background:transparent; margin: 20px auto;"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
 
@@ -3339,14 +3521,7 @@
         return;
       }
 
-      let cleanGraph = currentFlowchartGraph.trim();
-      if (cleanGraph.startsWith('```')) {
-        cleanGraph = cleanGraph.replace(/^```[a-zA-Z]*\n/, '').replace(/\n```$/, '');
-      }
-
-      if (!cleanGraph.includes('graph ') && !cleanGraph.includes('flowchart ')) {
-        cleanGraph = 'graph TD\n' + cleanGraph;
-      }
+      let cleanGraph = sanitizeMermaidGraph(currentFlowchartGraph);
 
       container.innerHTML = `<div class="thinking" style="border:none; background:transparent; margin: 20px auto;"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
 
@@ -3666,27 +3841,135 @@
       finally { g('sbtn').disabled = false; }
     }
 
-    function renderDSAMode(pattern, leetcode, exercises) {
+    function parsePlatformProblems(raw) {
+      if (!raw) return [];
+      const items = [];
+      raw.split('\n').filter(l => l.trim()).forEach(line => {
+        let cleanLine = line.replace(/^[-*•\d.\s]+/, '').trim();
+        if (!cleanLine) return;
+
+        const urlMatch = cleanLine.match(/https?:\/\/[^\s\)\]\"']+/i);
+        if (!urlMatch) return;
+        const link = urlMatch[0];
+
+        let plat = '';
+        const lowerLink = link.toLowerCase();
+        if (lowerLink.includes('geeksforgeeks') || lowerLink.includes('gfg')) plat = 'GeeksforGeeks';
+        else if (lowerLink.includes('leetcode')) plat = 'LeetCode';
+        else if (lowerLink.includes('hackerrank')) plat = 'HackerRank';
+        else if (lowerLink.includes('codeforces')) plat = 'Codeforces';
+        else if (lowerLink.includes('codingninjas') || lowerLink.includes('naukri')) plat = 'Coding Ninjas';
+        else if (lowerLink.includes('codolio')) plat = 'Codolio';
+
+        const parts = cleanLine.split('|');
+        let title = '';
+
+        if (parts.length >= 3) {
+          if (!plat) {
+            let pStr = parts[0].replace(/^[-*•\d.\s]+/, '').trim().toLowerCase();
+            if (pStr.includes('geeks') || pStr.includes('gfg')) plat = 'GeeksforGeeks';
+            else if (pStr.includes('leetcode')) plat = 'LeetCode';
+            else if (pStr.includes('hackerrank')) plat = 'HackerRank';
+            else if (pStr.includes('codeforces')) plat = 'Codeforces';
+            else if (pStr.includes('ninjas')) plat = 'Coding Ninjas';
+            else if (pStr.includes('codolio')) plat = 'Codolio';
+            else plat = parts[0].replace(/^[-*•\d.\s]+/, '').trim();
+          }
+          title = parts[1].replace(/^\d+\.\s+/, '').trim();
+        } else if (parts.length === 2) {
+          title = parts[0].replace(/^\d+\.\s+/, '').trim();
+        } else {
+          let tStr = cleanLine.replace(link, '').trim();
+          title = tStr.replace(/^[-*•:\d.\s]+/, '').replace(/^(LeetCode|GeeksforGeeks|GFG|HackerRank|Codeforces|Coding Ninjas|Codolio)[-:\s]*/i, '').trim();
+        }
+
+        if (!plat) plat = 'LeetCode';
+        if (!title) title = 'Practice Problem';
+
+        items.push({ platform: plat, title: title, link: link });
+      });
+      return items;
+    }
+
+    function filterPlatformProblems(platform) {
+      const container = g('dsa-leetcode-list');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      const targetPlat = (platform || 'all').toLowerCase().trim();
+      const filtered = (targetPlat === 'all') 
+        ? currentPlatformProblems 
+        : currentPlatformProblems.filter(p => {
+            const pName = p.platform.toLowerCase();
+            if (targetPlat.includes('geeks') || targetPlat.includes('gfg')) {
+              return pName.includes('geeks') || pName.includes('gfg');
+            }
+            if (targetPlat.includes('leetcode')) return pName.includes('leetcode');
+            if (targetPlat.includes('hackerrank')) return pName.includes('hackerrank');
+            if (targetPlat.includes('codeforces')) return pName.includes('codeforces');
+            if (targetPlat.includes('ninjas')) return pName.includes('ninjas');
+            if (targetPlat.includes('codolio')) return pName.includes('codolio');
+            return pName === targetPlat || pName.includes(targetPlat) || targetPlat.includes(pName);
+          });
+
+      if (!filtered.length) {
+        container.innerHTML = `<span style="color:var(--tx3); font-size:0.7rem; padding:8px;">No practice problems available for ${e(platform)}. Select "⚡ All Platforms" to view all recommendations.</span>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const card = ce('div');
+        card.style = 'background:var(--bg3); border:1px solid var(--b1); border-radius:var(--r1); padding:8px 12px; display:flex; align-items:center; justify-content:space-between; margin-bottom: 4px; transition: all 0.2s;';
+        const platStyle = getPlatformBadgeStyle(p.platform);
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; flex:1; text-align:left; overflow:hidden; padding-right:8px;">
+            <span style="${platStyle} font-family:var(--fui); font-size:0.58rem; font-weight:700; text-transform:uppercase; padding:2px 6px; border-radius:3px; flex-shrink:0;">${e(p.platform)}</span>
+            <span style="font-family:var(--fb); font-size:0.75rem; color:var(--tx2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${e(p.title)}</span>
+          </div>
+          <a href="${e(p.link)}" target="_blank" style="font-family:var(--fui); font-size:0.62rem; font-weight:700; color:var(--gold); text-decoration:none; text-transform:uppercase; border:1px solid rgba(201,168,76,0.3); padding:3px 8px; border-radius:4px; transition:all 0.2s; flex-shrink:0;">Practice ↗</a>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function getPlatformBadgeStyle(platform) {
+      const p = platform.toLowerCase();
+      if (p.includes('leetcode')) return 'background:rgba(245,166,35,0.12); color:var(--amber); border:1px solid rgba(245,166,35,0.25);';
+      if (p.includes('geeks')) return 'background:rgba(62,207,178,0.12); color:var(--teal); border:1px solid rgba(62,207,178,0.25);';
+      if (p.includes('hackerrank')) return 'background:rgba(74,158,255,0.12); color:var(--blue); border:1px solid rgba(74,158,255,0.25);';
+      if (p.includes('ninjas')) return 'background:rgba(240,96,96,0.12); color:var(--red); border:1px solid rgba(240,96,96,0.25);';
+      if (p.includes('codolio')) return 'background:rgba(167,139,250,0.12); color:var(--purp); border:1px solid rgba(167,139,250,0.25);';
+      if (p.includes('codeforces')) return 'background:rgba(244,132,95,0.12); color:var(--coral); border:1px solid rgba(244,132,95,0.25);';
+      return 'background:var(--bg4); color:var(--tx2); border:1px solid var(--b2);';
+    }
+
+    function renderOptimizedCode(code, timeCx, spaceCx) {
+      const card = g('optcode-card');
+      if (!card) return;
+      if (!code || !code.trim()) {
+        card.classList.add('hidden');
+        return;
+      }
+      card.classList.remove('hidden');
+      g('optcode-pre').textContent = code.trim();
+      g('optTimeBdg').textContent = 'Time: ' + (timeCx || 'O(?)');
+      g('optSpaceBdg').textContent = 'Space: ' + (spaceCx || 'O(?)');
+    }
+
+    function cpyOptimized() {
+      const code = g('optcode-pre').textContent;
+      if (code) {
+        navigator.clipboard.writeText(code).then(() => showToast('✓ Copied optimized code'));
+      }
+    }
+
+    function renderDSAMode(pattern, platformProblems, exercises) {
       g('dsa-pattern-desc').innerHTML = pattern ? (typeof marked !== 'undefined' ? marked.parse(pattern) : e(pattern)) : 'No patterns detected.';
       
-      const lcContainer = g('dsa-leetcode-list');
-      lcContainer.innerHTML = '';
-      if (leetcode) {
-        leetcode.split('\n').filter(l => l.trim()).forEach(line => {
-          const parts = line.split('|');
-          const title = parts[0] ? parts[0].replace(/^\d+\.\s+/, '').trim() : 'LeetCode Problem';
-          const link = parts[1] ? parts[1].trim() : 'https://leetcode.com';
-          const card = ce('div');
-          card.style = 'background:var(--bg3); border:1px solid var(--b1); border-radius:var(--r1); padding:8px 12px; display:flex; align-items:center; justify-content:space-between; margin-bottom: 4px;';
-          card.innerHTML = `
-            <span style="font-family:var(--fb); font-size:0.75rem; color:var(--tx2); flex:1; text-align:left;">${e(title)}</span>
-            <a href="${e(link)}" target="_blank" style="font-family:var(--fui); font-size:0.62rem; font-weight:700; color:var(--gold); text-decoration:none; text-transform:uppercase; border:1px solid rgba(201,168,76,0.3); padding:3px 8px; border-radius:4px; transition:all 0.2s;">Practice ↗</a>
-          `;
-          lcContainer.appendChild(card);
-        });
-      } else {
-        lcContainer.innerHTML = '<span style="color:var(--tx3); font-size:0.7rem;">No recommendations generated.</span>';
-      }
+      currentPlatformProblems = parsePlatformProblems(platformProblems);
+      const sel = g('dsa-platform-select');
+      const selectedPlat = sel ? sel.value : 'all';
+      filterPlatformProblems(selectedPlat);
 
       g('dsa-exercises-list').innerHTML = exercises ? (typeof marked !== 'undefined' ? marked.parse(exercises) : e(exercises)) : 'No practice exercises available.';
     }
