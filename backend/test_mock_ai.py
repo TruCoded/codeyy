@@ -42,9 +42,23 @@ DSA_PATTERN_START
 Simple Output Pattern
 DSA_PATTERN_END
 
-LEETCODE_PROBLEMS_START
-Hello World | https://leetcode.com/problems/hello-world
-LEETCODE_PROBLEMS_END
+PLATFORM_PROBLEMS_START
+LeetCode | Hello World | https://leetcode.com/problems/hello-world
+GeeksforGeeks | Print Hello World | https://www.geeksforgeeks.org/print-hello-world
+HackerRank | Say Hello World | https://www.hackerrank.com/challenges/say-hello-world
+PLATFORM_PROBLEMS_END
+
+OPTIMIZED_CODE_START
+print('hello')
+OPTIMIZED_CODE_END
+
+OPTIMIZED_TIME_COMPLEXITY_START
+O(1) constant time
+OPTIMIZED_TIME_COMPLEXITY_END
+
+OPTIMIZED_SPACE_COMPLEXITY_START
+O(1) constant space
+OPTIMIZED_SPACE_COMPLEXITY_END
 
 PRACTICE_EXERCISES_START
 Q1. Print something else.
@@ -106,7 +120,7 @@ async def run_mock_test():
     
     # Side effect function to return different mock responses
     call_count = 0
-    def mock_generate_content(model, contents):
+    def mock_generate_content(model, contents, **kwargs):
         nonlocal call_count
         call_count += 1
         if call_count == 1:
@@ -124,6 +138,10 @@ async def run_mock_test():
         assert result["time_complexity"] == "O(1) constant time", f"Got {result['time_complexity']}"
         assert result["recursion_tree"] == "RECURSION_NONE", f"Got {result['recursion_tree']}"
         assert "Prints hello" in result["dry_run"], f"Got {result['dry_run']}"
+        assert "GeeksforGeeks" in result["platform_problems"], f"Got {result['platform_problems']}"
+        assert result["optimized_code"] == "print('hello')", f"Got {result['optimized_code']}"
+        assert result["optimized_time_complexity"] == "O(1) constant time", f"Got {result['optimized_time_complexity']}"
+        assert result["optimized_space_complexity"] == "O(1) constant space", f"Got {result['optimized_space_complexity']}"
         
         print("[SUCCESS] Unit test passed! Parallel prompt queries executed and parsed correctly.")
 
