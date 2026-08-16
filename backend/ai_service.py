@@ -96,11 +96,11 @@ DSA_PATTERN_START
 DSA_PATTERN_END
 
 PLATFORM_PROBLEMS_START
-[Suggest 4-5 related practice problems for this pattern. CRITICAL MANDATE: You MUST include problems from AT LEAST 3 DIFFERENT PLATFORMS (mix of GeeksforGeeks, HackerRank, Codeforces, Coding Ninjas, Codolio, and LeetCode). DO NOT output only LeetCode links. For each problem, output strictly on a new line: Platform | Title | Link (use actual valid problem URLs like https://www.geeksforgeeks.org/..., https://www.hackerrank.com/..., https://codeforces.com/..., https://leetcode.com/...).]
+[Suggest 4-5 related practice problems for this pattern. CRITICAL ACCURACY MANDATE: You MUST include problem links ONLY for exact problem matches on that platform. Do NOT output a link if the platform does not feature that exact problem. Do NOT output generic or mismatched problem links. Mix of platforms (GeeksforGeeks, HackerRank, Codeforces, Coding Ninjas, and LeetCode). For each problem, output strictly on a new line: Platform | Title | Link (use actual valid problem URLs like https://www.geeksforgeeks.org/..., https://www.hackerrank.com/..., https://codeforces.com/..., https://leetcode.com/...).]
 PLATFORM_PROBLEMS_END
 
 OPTIMIZED_CODE_START
-[Provide the absolute most optimal version of the analyzed code in terms of time and space complexity. Do NOT use markdown code fences inside this tag.]
+[Provide the absolute most optimal version of the analyzed code in terms of time and space complexity. Do NOT use markdown code fences inside this tag. CRITICAL RULE: If the input code is ALREADY optimal in both time and space complexity, write strictly `ALREADY_OPTIMIZED` inside this block.]
 OPTIMIZED_CODE_END
 
 OPTIMIZED_TIME_COMPLEXITY_START
@@ -162,7 +162,8 @@ DRY_RUN_START
 CRITICAL VISUALIZATION RULES:
 1. If the code uses, traverses, or modifies any array, vector, list, or string (like search, sort, two-sum, reverse, sub-array, etc.), you MUST set "ds_type": "array" and "ds_data" to the current state of that array (e.g. [2, 7, 11, 15] or [0, 1, 1, 0, 1]). You MUST track the pointer indices (like i, j, k, low, mid, high, left, right, slow, fast) inside the "variables" object (e.g. {{"i": 1, "target": 9}}) so the frontend can float pointer arrows above/below the array boxes.
 2. If the code uses a map, dictionary, or set (like std::map, unordered_map, set, dict), set "ds_type": "map" or "ds_type": "set". Set "ds_data" to the key-value dictionary (e.g. {{ "2": 0, "7": 1 }}) or set element array (e.g. [2, 7]).
-3. End the array with a step representing the final return/output value.]
+3. Trace boundary cases and out-of-bound pointer index values (e.g. low > high, i = -1, i = N) inside the "variables" object when loop termination or out-of-bound checks occur so boundary conditions can be visually demonstrated.
+4. End the array with a step representing the final return/output value.]
 DRY_RUN_END
 
 FLOWCHART_START
